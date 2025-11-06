@@ -16,6 +16,10 @@ import interact from "interactjs"; // Librería para interacciones (arrastrar, r
 import { useResizable } from "../hooks/useResizable"; // Hook personalizado para la funcionalidad de redimensionamiento del editor.
 import { supabase } from "../lib/supabaseClient"; // Cliente de Supabase para interactuar con la base de datos/almacenamiento.
 
+// Necesario para el correcto tipado de handlePaste
+import { EditorView } from "@tiptap/pm/view";
+import { Slice } from "@tiptap/pm/model";
+
 // --- Importaciones de Iconos ---
 import {
   FaBold,
@@ -130,7 +134,7 @@ const uploadImage = async (file: File): Promise<string | null> => {
   const fileName = `${Date.now()}-${file.name}`;
   try {
     // Sube el archivo al bucket 'imagenes-correo' de Supabase Storage.
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from("imagenes-correo")
       .upload(fileName, file);
 
@@ -200,7 +204,8 @@ export default function RichTextEditor({
     editorProps: {
       attributes: { class: "editor-content" }, // Clase CSS para el área de edición.
       // Manejador personalizado para el evento de pegar contenido.
-      handlePaste: async (view, event) => {
+      // ✅ CORREGIDO: Se quitó 'async' y se añadió el parámetro 'slice' para ajustarse a la firma síncrona.
+      handlePaste: (view: EditorView, event: ClipboardEvent, slice: Slice) => { 
         const clipboardData = event.clipboardData;
         if (!clipboardData) return false; // No hay datos de portapapeles.
 
@@ -218,19 +223,22 @@ export default function RichTextEditor({
               return true; // Bloquea la acción por defecto.
             }
 
-            const imageUrl = await uploadImage(file); // Sube la imagen a Supabase.
-            if (imageUrl) {
-              // Inserta la imagen en el editor usando la URL pública.
-              editor
-                ?.chain()
-                .focus()
-                .setImage({ src: imageUrl, alt: "Imagen subida" })
-                .run();
-            } else {
-              alert("Error al subir imagen desde el portapapeles.");
-            }
+            // ✅ CORREGIDO: Manejo de la subida de imagen de forma asíncrona usando .then().
+            // Esto permite que handlePaste retorne de inmediato (síncrono).
+            uploadImage(file).then((imageUrl) => {
+              if (imageUrl) {
+                // Inserta la imagen en el editor una vez que la URL está lista.
+                editor
+                  ?.chain()
+                  .focus()
+                  .setImage({ src: imageUrl, alt: "Imagen subida" })
+                  .run();
+              } else {
+                alert("Error al subir imagen desde el portapapeles.");
+              }
+            });
           }
-          return true; // Indica que el evento fue manejado.
+          return true; // Indica que el evento de imagen fue manejado.
         }
 
         // --- Manejo de pegado de HTML (Tablas de Word/Web) ---
@@ -244,7 +252,7 @@ export default function RichTextEditor({
         // --- Manejo de pegado de Texto plano (Tablas de Excel) ---
         const textData = clipboardData.getData("text/plain");
         // Verifica si el texto contiene tabulaciones (\t) o espacios anchos (indicativos de tabla).
-        if (textData && (textData.includes("\t") || textData.includes("  "))) {
+        if (textData && (textData.includes("\t") || textData.includes("  "))) {
           const tableHTML = convertTextToTableGmail(textData); // Convierte el texto a HTML de tabla.
           if (tableHTML) {
             editor?.chain().focus().insertContent(tableHTML).run(); // Inserta la tabla generada.
