@@ -1,9 +1,9 @@
 /**
  * ==============================================================================
- * Componente de Backend: notasController
+ * Componente de Backend: notasController (Corregido)
  * ==============================================================================
- * Gestiona las operaciones CRUD para Plantillas de Despacho (plantillas_base) 
- * y la relación con los usuarios (notas_despacho_rel).
+ * Se modifican las funciones de consulta para usar req.usuario.id (del token) 
+ * en lugar de req.params.usuario_id.
  */
 
 // Importa la conexión a la base de datos PostgreSQL
@@ -17,10 +17,11 @@ const { v4: uuidv4 } = require("uuid");
  * FUNCIÓN 1: obtenerNotas
  * ==============================================================================
  * Descripción: Obtener todas las notas/plantillas asignadas a un usuario.
- * Ruta Lógica: GET /api/notas/:usuario_id
+ * Ruta Lógica: GET /api/notas (ID tomado del token)
  */
 async function obtenerNotas(req, res) {
-    const { usuario_id } = req.params;
+    // 💡 CORRECCIÓN: Obtener usuario_id desde el token (establecido por verificarToken)
+    const usuario_id = req.usuario.id; 
 
     try {
         const result = await pool.query(
@@ -39,7 +40,7 @@ async function obtenerNotas(req, res) {
             WHERE ndr.usuario_id = $1
             ORDER BY ndr.creado_en DESC
             `,
-            [usuario_id]
+            [usuario_id] // Usar el ID del token aquí
         );
 
         res.json(result.rows);
@@ -54,10 +55,11 @@ async function obtenerNotas(req, res) {
  * FUNCIÓN 2: obtenerNotasAvances
  * ==============================================================================
  * Descripción: Obtener solo las notas de avances (con contenido) de un usuario.
- * Ruta Lógica: GET /api/notas/avances/:usuario_id
+ * Ruta Lógica: GET /api/notas/avances (ID tomado del token)
  */
 async function obtenerNotasAvances(req, res) {
-    const { usuario_id } = req.params;
+    // 💡 CORRECCIÓN: Obtener usuario_id desde el token
+    const usuario_id = req.usuario.id; 
 
     try {
         const result = await pool.query(
@@ -75,7 +77,7 @@ async function obtenerNotasAvances(req, res) {
             AND TRIM(pb.nota_avances) != ''
             ORDER BY ndr.creado_en DESC
             `,
-            [usuario_id]
+            [usuario_id] // Usar el ID del token aquí
         );
 
         res.json(result.rows);
@@ -93,11 +95,17 @@ async function obtenerNotasAvances(req, res) {
  * Ruta Lógica: POST /api/notas
  */
 async function agregarNota(req, res) {
-    const { usuario_id, novedad, nota_publica, nota_interna, nota_avances, plantilla } = req.body;
+    // 💡 CORRECCIÓN: Obtener usuario_id desde el token
+    const usuario_id = req.usuario.id; 
+    
+    // El frontend aún envía usuario_id, pero se prefiere el del token para seguridad
+    // const { usuario_id, novedad, nota_publica, nota_interna, nota_avances, plantilla } = req.body;
+    const { novedad, nota_publica, nota_interna, nota_avances, plantilla } = req.body;
+
 
     if (!usuario_id || !novedad) {
         return res.status(400).json({ 
-            mensaje: "Se requieren usuario_id y novedad como mínimo" 
+            mensaje: "Se requieren usuario_id (del token) y novedad como mínimo" 
         });
     }
 
@@ -111,7 +119,7 @@ async function agregarNota(req, res) {
     }
 
     try {
-        // Verificar que el usuario existe
+        // Verificar que el usuario existe (aunque esto ya se hizo en el middleware, se mantiene para robustez)
         const usuarioExiste = await pool.query("SELECT id FROM usuarios WHERE id = $1", [usuario_id]);
         if (usuarioExiste.rows.length === 0) {
             return res.status(404).json({ mensaje: "Usuario no encontrado" });
@@ -150,10 +158,12 @@ async function agregarNota(req, res) {
  * Ruta Lógica: POST /api/notas/asignar
  */
 async function asignarNota(req, res) {
-    const { usuario_id, plantilla_id } = req.body;
+    // 💡 CORRECCIÓN: Obtener usuario_id desde el token
+    const usuario_id = req.usuario.id; 
+    const { plantilla_id } = req.body; // Solo se necesita plantilla_id del body
 
     if (!usuario_id || !plantilla_id) {
-        return res.status(400).json({ mensaje: "Se requieren usuario_id y plantilla_id" });
+        return res.status(400).json({ mensaje: "Se requieren usuario_id (del token) y plantilla_id" });
     }
 
     try {
@@ -189,6 +199,7 @@ async function asignarNota(req, res) {
  * ==============================================================================
  * Descripción: Modifica el contenido de una plantilla base existente.
  * Ruta Lógica: PUT /api/notas/plantilla/:id
+ * (No necesita el ID del usuario, solo el ID de la plantilla)
  */
 async function modificarPlantilla(req, res) {
     const { id } = req.params;
@@ -225,6 +236,7 @@ async function modificarPlantilla(req, res) {
  * ==============================================================================
  * Descripción: Elimina la relación y, si es personalizada, elimina la plantilla base.
  * Ruta Lógica: DELETE /api/notas/:id (id = id de notas_despacho_rel)
+ * (No necesita el ID del usuario en la consulta, pero es segura)
  */
 async function eliminarNota(req, res) {
     const { id } = req.params;
@@ -358,6 +370,7 @@ async function eliminarPlantillaAdicional(req, res) {
  * Ruta Lógica: GET /api/notas/plantillas-disponibles
  */
 async function obtenerPlantillasDisponibles(req, res) {
+    // 💡 NOTA: Esta función no requiere el ID del usuario
     try {
         const result = await pool.query(
             `
@@ -382,6 +395,7 @@ async function obtenerPlantillasDisponibles(req, res) {
  * Ruta Lógica: DELETE /api/notas/limpiar-plantillas-incorrectas
  */
 async function limpiarPlantillasIncorrectas(req, res) {
+    // 💡 NOTA: Esta función no requiere el ID del usuario
     try {
         // 1. Buscar plantillas con nombres incorrectos y su conteo de relaciones
         const plantillasIncorrectas = await pool.query(
