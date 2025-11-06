@@ -10,20 +10,22 @@ const verificarToken = require('../middlewares/auth');
 
 
 // ==============================
-//  OBTENER NOTAS
+//  OBTENER NOTAS (CORREGIDAS PARA SEGURIDAD)
 // ==============================
 
 /**
- * Ruta: GET /api/notas/:usuario_id
- * Descripción: Obtiene todas las notas del usuario
+ * Ruta: GET /api/notas/
+ * Descripción: Obtiene todas las notas del usuario (ID tomado del token)
+ * 🚨 Importante: La lógica en el Controller debe usar req.usuario.id
  */
-router.get('/:usuario_id', verificarToken, notasController.obtenerNotas);
+router.get('/', verificarToken, notasController.obtenerNotas);
 
 /**
- * Ruta: GET /api/notas/avances/:usuario_id
- * Descripción: Obtiene solo las notas de avances del usuario
+ * Ruta: GET /api/notas/avances
+ * Descripción: Obtiene solo las notas de avances del usuario (ID tomado del token)
+ * 🚨 ELIMINADO: La URL ya no incluye :usuario_id
  */
-router.get('/avances/:usuario_id', verificarToken, notasController.obtenerNotasAvances);
+router.get('/avances', verificarToken, notasController.obtenerNotasAvances);
 
 /**
  * Ruta: GET /api/notas/plantillas-disponibles
@@ -39,14 +41,13 @@ router.get('/plantillas-disponibles', verificarToken, notasController.obtenerPla
 /**
  * Ruta: POST /api/notas
  * Descripción: Crea una nueva nota personalizada
- * Body esperado: { usuario_id, novedad, nota_publica, nota_interna, nota_avances, plantilla }
+ * El Controller debe obtener el usuario_id de req.usuario.id
  */
 router.post('/', verificarToken, notasController.agregarNota);
 
 /**
  * Ruta: POST /api/notas/asignar
  * Descripción: Asigna una plantilla base existente al usuario
- * Body esperado: { usuario_id, plantilla_id }
  */
 router.post('/asignar', verificarToken, notasController.asignarNota);
 
@@ -63,13 +64,13 @@ router.put('/plantilla/:id', verificarToken, notasController.modificarPlantilla)
 
 /**
  * Ruta: DELETE /api/notas/:id
- * Descripción: Elimina completamente una nota (rompe la relación usuario ↔ plantilla)
+ * Descripción: Elimina completamente una nota
  */
 router.delete('/:id', verificarToken, notasController.eliminarNota);
 
 /**
  * Ruta: PATCH /api/notas/limpiar-avances/:id
- * Descripción: Limpia solo el campo nota_avances (sin eliminar la fila)
+ * Descripción: Limpia solo el campo nota_avances
  */
 router.patch('/limpiar-avances/:id', verificarToken, notasController.limpiarNotaAvances);
 
@@ -81,7 +82,7 @@ router.delete('/plantilla/:id', verificarToken, notasController.eliminarPlantill
 
 /**
  * Ruta: DELETE /api/notas/limpiar-plantillas-incorrectas
- * Descripción: Elimina plantillas con nombres incorrectos (como "AVANCE")
+ * Descripción: Elimina plantillas con nombres incorrectos
  */
 router.delete('/limpiar-plantillas-incorrectas', verificarToken, notasController.limpiarPlantillasIncorrectas);
 
