@@ -1,9 +1,8 @@
 /**
  * ==============================================================================
- * Componente de Backend: notasController (Corregido)
+ * Componente de Backend: notasController (Final Corregido)
  * ==============================================================================
- * Se modifican las funciones de consulta para usar req.usuario.id (del token) 
- * en lugar de req.params.usuario_id.
+ * Incluye corrección SQL para evitar Error 500 por comparación de string vacía.
  */
 
 // Importa la conexión a la base de datos PostgreSQL
@@ -46,13 +45,13 @@ async function obtenerNotas(req, res) {
         res.json(result.rows);
     } catch (error) {
         console.error("❌ Error al obtener las notas:", error);
-        res.status(500).json({ mensaje: "Error al obtener las notas", error });
+        res.status(500).json({ mensaje: "Error al obtener las notas", error: error.message || "Error desconocido en el servidor" });
     }
 }
 
 /**
  * ==============================================================================
- * FUNCIÓN 2: obtenerNotasAvances
+ * FUNCIÓN 2: obtenerNotasAvances (CORRECCIÓN APLICADA AQUÍ)
  * ==============================================================================
  * Descripción: Obtener solo las notas de avances (con contenido) de un usuario.
  * Ruta Lógica: GET /api/notas/avances (ID tomado del token)
@@ -73,8 +72,9 @@ async function obtenerNotasAvances(req, res) {
             FROM notas_despacho_rel ndr
             INNER JOIN plantillas_base pb ON ndr.plantilla_id = pb.id
             WHERE ndr.usuario_id = $1
-            AND pb.nota_avances IS NOT NULL
-            AND TRIM(pb.nota_avances) != ''
+              AND pb.nota_avances IS NOT NULL
+              -- 🛑 CORRECCIÓN CLAVE: Usamos LENGTH(TRIM(...)) > 0 para robustez
+              AND LENGTH(TRIM(pb.nota_avances)) > 0 
             ORDER BY ndr.creado_en DESC
             `,
             [usuario_id] // Usar el ID del token aquí
@@ -83,7 +83,7 @@ async function obtenerNotasAvances(req, res) {
         res.json(result.rows);
     } catch (error) {
         console.error("❌ Error al obtener notas de avances:", error);
-        res.status(500).json({ mensaje: "Error al obtener notas de avances", error });
+        res.status(500).json({ mensaje: "Error al obtener notas de avances", error: error.message || "Error desconocido en el servidor" });
     }
 }
 
@@ -226,7 +226,7 @@ async function modificarPlantilla(req, res) {
         });
     } catch (error) {
         console.error("❌ Error al modificar plantilla:", error);
-        res.status(500).json({ mensaje: "Error al modificar plantilla", error });
+        res.status(500).json({ mensaje: "Error al modificar plantilla", error: error.message || "Error desconocido en el servidor" });
     }
 }
 
@@ -319,7 +319,7 @@ async function limpiarNotaAvances(req, res) {
         res.json({ mensaje: "Nota de avances eliminada correctamente" });
     } catch (error) {
         console.error("❌ Error al limpiar nota de avances:", error);
-        res.status(500).json({ mensaje: "Error al limpiar nota de avances", error });
+        res.status(500).json({ mensaje: "Error al limpiar nota de avances", error: error.message || "Error desconocido en el servidor" });
     }
 }
 
