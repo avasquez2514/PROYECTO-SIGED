@@ -97,11 +97,16 @@ const NotasAvances: React.FC<NotasAvancesProps> = ({ torre }) => {
   /**
    * Carga las notas de avance desde la API
    */
-  const cargarNotas = useCallback(async () => {
-    // Validamos solo el token, el ID del usuario se obtiene en el backend desde el token.
-    if (!token) return;
-
-    setCargando(true);
+const cargarNotas = useCallback(async () => {
+    // Validamos solo el token, el ID del usuario se obtiene en el backend desde el token.
+    if (!token) {
+      console.log("❌ Token no encontrado. No se puede llamar a /api/notas/avances");
+      return;
+    }
+        // Si llegamos aquí, el token existe. Lo imprimimos (cuidado de no dejar esto en producción)
+    console.log("🔑 Token para cargar notas:", token.substring(0, 10) + '...'); 
+    
+    setCargando(true);
 
     try {
       // ✅ CORRECCIÓN CLAVE: Se elimina el usuario_id de la URL.
