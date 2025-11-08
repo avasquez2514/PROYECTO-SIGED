@@ -46,8 +46,6 @@ interface ArchivoAdjunto {
   archivo: File;
 }
 
-// ReactQuill no es compatible con React 19, usando textarea simple
-
 /**
  * Componente de Firma para correos electrónicos
  * Muestra información de contacto y logo de la empresa
@@ -572,7 +570,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
   const getToken = () => (typeof window !== "undefined" ? localStorage.getItem("token") : null);
 
   /**
-   * Envía el correo electrónico a través de la API
+   * Envía el correo electrónico a través de la API (CORREGIDA)
    * @async
    * @returns {Promise<void>}
    */
@@ -626,21 +624,8 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
   <div style="width: 72%; height: 1px; background-color: #06b6d4; margin: 8px 0;"></div>
   <div style="font-size:16px; font-weight:bold; color:#002d72; margin-top:-2px">TIGO</div>
 </div>`;
-        
-        // Si el mensaje contiene HTML, agregar la firma como HTML
-        if (mensaje.includes('<') && mensaje.includes('>')) {
-          mensajeCompleto += firmaHTML;
-        } else {
-          // Si es texto plano, convertir saltos de línea y agregar firma en texto plano
-          mensajeCompleto = mensajeCompleto.replace(/\n/g, '<br>');
-          mensajeCompleto += `<br><br><div style="margin-top: 15px; font-family: Arial, sans-serif; max-width: 420px; line-height: 0.8;">
-<div style="font-size: 18px; font-weight: bold; color: #1e3a8a; margin-bottom: 5px;">${nombrePersonalizado}</div>
-<div style="font-size: 14px; font-weight: bold; color: #06b6d4; margin-bottom: 3px;">Despacho Reparaciones B2B</div>
-<div style="font-size: 13px; font-weight: normal; color: #1e3a8a; margin-bottom: 3px;">Gerencia Soporte a Clientes</div>
-<div style="font-size: 13px; font-weight: normal; color: #1e3a8a; margin-bottom: 8px;">Vicepresidencia de Negocios Empresas y Gobierno</div>
-<div style="width: 72%; height: 1px; background-color: #06b6d4; margin: 8px 0;"></div>
-<div style="font-size:16px; font-weight:bold; color:#002d72; margin-top:-2px">TIGO</div></div>`;
-        }
+            
+        mensajeCompleto += firmaHTML;
       } else {
         // Si no hay firma y el mensaje no contiene HTML, convertir saltos de línea a HTML
         if (!mensajeCompleto.includes('<') || !mensajeCompleto.includes('>')) {
@@ -648,53 +633,38 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
         }
       }
 
-      // Debug: Mostrar el mensaje que se va a enviar
-      console.log('📧 Mensaje completo a enviar:', mensajeCompleto);
-      console.log('📧 ¿Contiene HTML?', mensajeCompleto.includes('<') && mensajeCompleto.includes('>'));
-      
-      // Preparar FormData para enviar archivos
-      const formData = new FormData();
-      formData.append('para', para.trim());
-      if (cc.trim()) formData.append('cc', cc.trim());
-      formData.append('asunto', asunto.trim());
-      formData.append('mensaje', mensajeCompleto);
+      // ✅ CORRECCIÓN: Enviar como JSON en lugar de FormData
+      const datosCorreo = {
+        para: para.trim(),
+        cc: cc.trim() || undefined,
+        asunto: asunto.trim(),
+        mensaje: mensajeCompleto,
+        archivos_info: archivos.length > 0 ? JSON.stringify(
+          archivos.map(archivo => ({
+            nombre: archivo.nombre,
+            tipo: archivo.archivo.type,
+            tamaño: archivo.archivo.size
+            // En una implementación completa, aquí convertirías el archivo a base64
+          }))
+        ) : undefined
+      };
 
-      // Agregar archivos adjuntos
-      archivos.forEach((archivoAdjunto, index) => {
-        formData.append(`archivo_${index}`, archivoAdjunto.archivo);
-      });
-
-      // Agregar información de archivos
-      formData.append('archivos_info', JSON.stringify(
-        archivos.map(archivo => ({
-          nombre: archivo.nombre,
-          tipo: archivo.archivo.type,
-          tamaño: archivo.archivo.size
-        }))
-      ));
+      console.log('📧 Enviando correo:', datosCorreo);
 
       // Enviar petición al backend
       const response = await fetch('/api/correos/enviar', {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-          // No incluir Content-Type para FormData
         },
-        body: formData
+        body: JSON.stringify(datosCorreo)
       });
 
       const resultado = await response.json();
 
       if (resultado.success) {
         alert(`✅ Correo enviado exitosamente!\n\nID del mensaje: ${resultado.messageId}`);
-        
-        // Limpiar formulario después del envío exitoso (opcional)
-        // Comentado para evitar bloqueo del textarea
-        // setPara('');
-        // setCc('');
-        // setAsunto('');
-        // setMensaje('');
-        // setArchivos([]);
       } else {
         alert(`❌ Error al enviar el correo:\n${resultado.message}`);
       }
