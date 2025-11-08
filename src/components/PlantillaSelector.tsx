@@ -152,7 +152,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
 
   const copiarTexto = () => {
     navigator.clipboard.writeText(textoNota);
-    alert("Texto copiado al portapapeles");
   };
 
   const limpiarTexto = () => {
