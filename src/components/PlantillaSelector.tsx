@@ -433,6 +433,15 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
                 placeholder="Nombre de la plantilla..."
               />
 
+            <label>Nota Interna:</label>
+              <textarea
+                rows={3}
+                value={formData.nota_interna}
+                onChange={(e) => setFormData({ ...formData, nota_interna: e.target.value })}
+                placeholder="Contenido de la nota interna..."
+              />
+            </div>
+
               <label>Nota Pública:</label>
               <textarea
                 rows={3}
@@ -441,14 +450,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
                 placeholder="Contenido de la nota pública..."
               />
 
-              <label>Nota Interna:</label>
-              <textarea
-                rows={3}
-                value={formData.nota_interna}
-                onChange={(e) => setFormData({ ...formData, nota_interna: e.target.value })}
-                placeholder="Contenido de la nota interna..."
-              />
-            </div>
 
             <div className="modal-buttons">
               <button onClick={handleSubmitModal} className="modal-save-button">
