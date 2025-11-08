@@ -2,13 +2,13 @@
 
 .envio-container {
     /* Ocupa el 100% de la altura de la ventana (vh) */
-    height: 83vh;
+    height: 80vh;
     background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
     display: flex;
     flex-direction: column; /* Apila Header, Content y Footer */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden; /* Evita scroll en el body principal */
-    width: 40%;
+    width: 42%;
 }
 
 /* Header */
@@ -120,7 +120,7 @@
 }
 
 .envio-textarea {
-  min-height: 80px;
+  min-height: 57px;
   resize: vertical;
 }
 
