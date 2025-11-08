@@ -1,9 +1,10 @@
 /**
  * ==============================================================================
- * Componente de Backend: aplicativosController
+ * Componente de Backend: aplicativosController (CORREGIDO)
  * ==============================================================================
  * Centraliza la lógica de negocio para la gestión de aplicativos de usuario.
  * Utiliza un modelo de datos normalizado (aplicativos_base y aplicativos_rel).
+ * ✅ CORREGIDO: Ahora usa req.usuario.id del token en lugar de parámetros/body
  */
 
 // Importa la conexión a la base de datos PostgreSQL
@@ -14,17 +15,18 @@ const { v4: uuidv4 } = require("uuid");
 
 /**
  * ==============================================================================
- * FUNCIÓN 1: obtenerAplicativos
+ * FUNCIÓN 1: obtenerAplicativos (CORREGIDA)
  * ==============================================================================
  * Descripción: Obtiene todos los aplicativos vinculados a un usuario específico.
  * Método: GET
- * Ruta Lógica: /api/aplicativos?usuario_id=ID
+ * Ruta Lógica: /api/aplicativos
  *
- * @param {import('express').Request} req - Requiere 'usuario_id' en los query parameters.
+ * @param {import('express').Request} req - Toma usuario_id del token (req.usuario.id)
  * @param {import('express').Response} res - Devuelve la lista de aplicativos.
  */
 const obtenerAplicativos = async (req, res) => {
-    const { usuario_id } = req.query; // Extrae el ID del usuario desde la consulta
+    // ✅ CORRECCIÓN: Obtener usuario_id desde el token
+    const usuario_id = req.usuario.id;
 
     try {
         // Consulta que une aplicativos_rel (relación) y aplicativos_base (detalles)
@@ -53,23 +55,25 @@ const obtenerAplicativos = async (req, res) => {
 
 /**
  * ==============================================================================
- * FUNCIÓN 2: agregarAplicativo
+ * FUNCIÓN 2: agregarAplicativo (CORREGIDA)
  * ==============================================================================
  * Descripción: Crea un nuevo registro en 'aplicativos_base' (personalizado) y luego
  * establece la relación con el usuario en 'aplicativos_rel' (DOBLE INSERCIÓN).
  * Método: POST
  * Ruta Lógica: /api/aplicativos
  *
- * @param {import('express').Request} req - Requiere 'usuario_id' y 'nombre' en el body.
+ * @param {import('express').Request} req - Requiere 'nombre' en el body (usuario_id del token)
  * @param {import('express').Response} res - Devuelve los IDs creados.
  */
 const agregarAplicativo = async (req, res) => {
-    const { usuario_id, nombre, url, categoria } = req.body;
+    // ✅ CORRECCIÓN: Obtener usuario_id desde el token
+    const usuario_id = req.usuario.id;
+    const { nombre, url, categoria } = req.body;
 
-    // Validación de entrada
-    if (!usuario_id || !nombre) {
+    // Validación de entrada (solo nombre es requerido ahora)
+    if (!nombre) {
         return res.status(400).json({ 
-            mensaje: "Se requieren usuario_id y nombre como mínimo" 
+            mensaje: "Se requiere el nombre del aplicativo" 
         });
     }
 
@@ -122,23 +126,25 @@ const agregarAplicativo = async (req, res) => {
 
 /**
  * ==============================================================================
- * FUNCIÓN 3: asignarAplicativo
+ * FUNCIÓN 3: asignarAplicativo (CORREGIDA)
  * ==============================================================================
  * Descripción: Asigna un aplicativo base (preexistente) a un usuario. Solo inserta
  * una relación en 'aplicativos_rel'.
  * Método: POST
  * Ruta Lógica: /api/aplicativos/asignar
  *
- * @param {import('express').Request} req - Requiere 'usuario_id' y 'aplicativo_base_id' en el body.
+ * @param {import('express').Request} req - Requiere 'aplicativo_base_id' en el body (usuario_id del token)
  * @param {import('express').Response} res - Devuelve el ID de la relación creada.
  */
 const asignarAplicativo = async (req, res) => {
-    const { usuario_id, aplicativo_base_id } = req.body;
+    // ✅ CORRECCIÓN: Obtener usuario_id desde el token
+    const usuario_id = req.usuario.id;
+    const { aplicativo_base_id } = req.body;
 
     // Validación de entrada
-    if (!usuario_id || !aplicativo_base_id) {
+    if (!aplicativo_base_id) {
         return res.status(400).json({ 
-            mensaje: "Se requieren usuario_id y aplicativo_base_id" 
+            mensaje: "Se requiere aplicativo_base_id" 
         });
     }
 
