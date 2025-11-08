@@ -36,6 +36,8 @@ body {
      pero en el caso de la imagen, la quitamos para que se adapte al contenido. */
   min-height: fit-content; /* O simplemente omítelo */ 
   align-items: baseline;
+  padding: 4%;
+  width: 70%;
 }
 
 
