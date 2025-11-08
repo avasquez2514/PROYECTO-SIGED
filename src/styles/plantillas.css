@@ -2,13 +2,13 @@
 
 /* Contenedor principal. Fija altura mínima y centra el contenido. Ocupa el 35% del ancho en escritorio. */
 .plantilla-container {
-  min-height: 67vh;
-  padding: 2rem;
+  min-height: 65vh;
+  padding: 0rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 35%;
+  width: 38%;
 }
 
 /* Card Principal: Estilo oscuro con gradiente, borde sutil y sombra dramática */
@@ -84,7 +84,7 @@
 .plantilla-select {
   width: 100%;
   background: #0f1419;
-  border: 1px solid #2d3748;
+  border: 1px solid #6a747a;
   color: #ffffff;
   padding: 0.875rem 1rem;
   border-radius: 0.5rem;
@@ -127,7 +127,7 @@
 .plantilla-textarea {
   width: 100%;
   min-height: 180px;
-  background: #f8f9fa;
+  background: #f8f8f7eb;
   border: 1px solid #e2e8f0;
   color: #1e293b;
   padding: 1rem;
