@@ -604,7 +604,7 @@ const NotasRapidas: React.FC = () => {
         {/* Panel lateral con lista de notas */}
         <div className="notas-lista">
           <h3>Lista de Notas</h3>
-          <div className="notas-list">
+          <div className="notas-listr">
             {/* Ordenar notas por fecha de modificación (más recientes primero) */}
             {notas.sort((a, b) => new Date(b.fechaModificacion).getTime() - new Date(a.fechaModificacion).getTime())
               .map((nota) => (
