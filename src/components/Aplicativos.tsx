@@ -1,37 +1,13 @@
-/**
- * Componente: Aplicativos
- * ------------------------------------------
- * 
- * Este componente gestiona la visualización, creación, edición
- * y eliminación de aplicativos clasificados por categoría.
- * Cada usuario autenticado puede tener su propio conjunto
- * de aplicativos, los cuales se almacenan y protegen mediante
- * autenticación JWT en el backend.
- * 
- * ------------------------------------------
- * FUNCIONALIDADES PRINCIPALES:
- * 
- * - Listar aplicativos agrupados por categoría.
- * - Filtrar aplicativos por nombre en tiempo real.
- * - Agregar nuevos aplicativos asociados al usuario actual.
- * - Editar o eliminar aplicativos existentes.
- * - Crear y eliminar categorías personalizadas.
- * - Sincronizar datos con el backend mediante peticiones HTTP (fetch)
- *   autenticadas con token JWT.
- */
-
-
-  };
-
-  /**
-   * Guarda los cambios de un aplicativo editado
-   * @async
-   * @returns {Promise<void>}
-   
-   */
-
-
 "use client";
+
+/**
+ * Componente: Aplicativos (CORREGIDO)
+ * ------------------------------------------
+ * 
+ * ✅ CORREGIDO: Ahora no envía usuario_id en las requests
+ * ✅ CORREGIDO: Usa rutas relativas para producción
+ * ✅ CORREGIDO: Sincronizado con el backend actualizado
+ */
 
 import React, { useEffect, useState } from "react";
 import { FaPlus, FaSearch } from "react-icons/fa";
