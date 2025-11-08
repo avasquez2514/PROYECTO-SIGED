@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * Componente: Aplicativos
  * ------------------------------------------
@@ -22,21 +20,25 @@
  *   autenticadas con token JWT.
  */
 
+
+  };
+
+  /**
+   * Guarda los cambios de un aplicativo editado
+   * @async
+   * @returns {Promise<void>}
+   
+   */
+
+
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import "../styles/aplicativos.css";
 import Modal from "./Modal";
 
 // --- INTERFACES ---
-
-/**
- * Interfaz que define la estructura de un aplicativo
- * @interface Aplicativo
- * @property {number} id - Identificador único del aplicativo
- * @property {string} nombre - Nombre descriptivo del aplicativo
- * @property {string} url - URL de acceso al aplicativo
- * @property {string} categoria - Categoría a la que pertenece el aplicativo
- */
 interface Aplicativo {
   id: number;
   nombre: string;
@@ -44,13 +46,6 @@ interface Aplicativo {
   categoria: string;
 }
 
-/**
- * Interfaz para la creación de nuevos aplicativos
- * @interface NuevoAplicativo
- * @property {string} nombre - Nombre del nuevo aplicativo
- * @property {string} url - URL del nuevo aplicativo
- * @property {string} categoria - Categoría del nuevo aplicativo
- */
 interface NuevoAplicativo {
   nombre: string;
   url: string;
@@ -58,130 +53,65 @@ interface NuevoAplicativo {
 }
 
 // --- CONSTANTES ---
+// ✅ CORRECCIÓN: Usa ruta relativa para producción
+const API = `/api/aplicativos`;
 
 /**
- * URL base de la API para operaciones CRUD de aplicativos
- * @constant {string}
- */
-const API = `http://localhost:4000/api/aplicativos`;
-
-/**
- * Componente principal de gestión de aplicativos
- * @component
- * @returns {JSX.Element} Interfaz completa de gestión de aplicativos
+ * Componente principal de gestión de aplicativos (CORREGIDO)
  */
 const Aplicativos: React.FC = () => {
   // --- ESTADO ---
-  
-  /**
-   * Estado que almacena la lista completa de aplicativos del usuario
-   * @state {Aplicativo[]}
-   */
   const [aplicativos, setAplicativos] = useState<Aplicativo[]>([]);
-  
-  /**
-   * Estado para el formulario de nuevo aplicativo o edición
-   * @state {NuevoAplicativo}
-   */
   const [nuevo, setNuevo] = useState<NuevoAplicativo>({
     nombre: "",
     url: "",
     categoria: "",
   });
-  
-  /**
-   * Estado que almacena las categorías disponibles del usuario
-   * @state {string[]}
-   */
   const [categoriasDisponibles, setCategoriasDisponibles] = useState<string[]>([]);
-  
-  /**
-   * Estado para el nombre de nueva categoría en el modal
-   * @state {string}
-   */
   const [otraCategoria, setOtraCategoria] = useState("");
-  
-  /**
-   * Estado que controla la categoría actualmente seleccionada en la sidebar
-   * @state {string}
-   */
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
-
-  /**
-   * Estado que controla la visibilidad del modal
-   * @state {boolean}
-   */
   const [modalOpen, setModalOpen] = useState(false);
-  
-  /**
-   * Estado que indica si se está editando un aplicativo existente
-   * @state {boolean}
-   */
   const [editando, setEditando] = useState(false);
-  
-  /**
-   * Estado que almacena el ID del aplicativo en edición
-   * @state {number | null}
-   */
   const [editandoId, setEditandoId] = useState<number | null>(null);
-  
-  /**
-   * Estado que controla el tipo de modal activo (aplicativo o categoría)
-   * @state {"aplicativo" | "categoria"}
-   */
   const [modoModal, setModoModal] = useState<"aplicativo" | "categoria">("aplicativo");
-
-  /**
-   * Estado para el filtro de búsqueda por nombre de aplicativo
-   * @state {string}
-   */
   const [filtroNombre, setFiltroNombre] = useState("");
 
   // --- LÓGICA PRINCIPAL ---
 
-  /**
-   * Obtiene los datos del usuario desde localStorage
-   * @returns {object | null} Datos del usuario o null si no está autenticado
-   */
-  const getUsuario = () => {
-    // Verificar que window está disponible (evita errores en SSR)
-    if (typeof window === "undefined") return null;
-    const raw = localStorage.getItem("usuario");
-    return raw ? JSON.parse(raw) : null;
-  };
-
-  /**
-   * Obtiene el token JWT desde localStorage
-   * @returns {string | null} Token de autenticación o null
-   */
   const getToken = () =>
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   /**
    * Efecto que carga los aplicativos al montar el componente
-   * Se ejecuta una vez al inicializar el componente
    */
   useEffect(() => {
     fetchAplicativos();
   }, []);
 
   /**
-   * Función asíncrona que obtiene los aplicativos del usuario desde la API
-   * @async
-   * @returns {Promise<void>}
+   * Función asíncrona que obtiene los aplicativos del usuario desde la API (CORREGIDA)
    */
   const fetchAplicativos = async () => {
     const token = getToken();
-    const usuario = getUsuario();
     
-    // Validar que existe autenticación
-    if (!token || !usuario?.id) return;
+    // ✅ CORRECCIÓN: Solo validamos token, no usuario_id
+    if (!token) {
+      console.log("❌ Token no encontrado");
+      return;
+    }
 
     try {
-      // Realizar petición GET a la API con autenticación
-      const res = await fetch(`${API}?usuario_id=${usuario.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      // ✅ CORRECCIÓN: No enviamos usuario_id por query params
+      const res = await fetch(API, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       });
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
 
       const data: Aplicativo[] = await res.json();
       setAplicativos(data);
@@ -200,131 +130,142 @@ const Aplicativos: React.FC = () => {
   };
 
   /**
-   * Agrega un nuevo aplicativo a través de la API
-   * @async
-   * @returns {Promise<void>}
+   * Agrega un nuevo aplicativo a través de la API (CORREGIDA)
    */
   const agregarAplicativo = async () => {
     const token = getToken();
-    const usuario = getUsuario();
     
-    // Validaciones de autenticación y datos requeridos
-    if (!token || !usuario?.id) return;
-    if (!nuevo.nombre || !nuevo.url || !nuevo.categoria)
+    // ✅ CORRECCIÓN: Solo validamos token, no usuario_id
+    if (!token) {
+      console.log("❌ Token no encontrado");
+      return;
+    }
+    
+    if (!nuevo.nombre || !nuevo.url || !nuevo.categoria) {
       return alert("Completa todos los campos");
+    }
 
     try {
-      // Petición POST para crear nuevo aplicativo
-      await fetch(API, {
+      // ✅ CORRECCIÓN: No enviamos usuario_id en el body
+      const response = await fetch(API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...nuevo, usuario_id: usuario.id }),
+        body: JSON.stringify({ 
+          nombre: nuevo.nombre,
+          url: nuevo.url,
+          categoria: nuevo.categoria
+        }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.mensaje || `Error ${response.status}`);
+      }
 
       resetFormulario();
       fetchAplicativos(); // Recargar lista
     } catch (err) {
-      console.error("Error al agregar:", err);
+      console.error("Error al agregar aplicativo:", err);
+      alert(`Error al agregar aplicativo: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
   /**
-   * Guarda los cambios de un aplicativo editado
-   * @async
-   * @returns {Promise<void>}
+   * Guarda los cambios de un aplicativo editado (CORREGIDA)
    */
   const guardarEdicion = async () => {
     const token = getToken();
-    const usuario = getUsuario();
     
-    // Validar que hay un aplicativo en edición
-    if (!token || !usuario?.id || !editandoId) return;
+    // ✅ CORRECCIÓN: Solo validamos token
+    if (!token || !editandoId) return;
 
     try {
-      // Petición PUT para actualizar aplicativo existente
-      await fetch(`${API}/${editandoId}`, {
+      // ✅ CORRECCIÓN: No enviamos usuario_id en el body
+      const response = await fetch(`${API}/${editandoId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...nuevo, usuario_id: usuario.id }),
+        body: JSON.stringify({ 
+          nombre: nuevo.nombre,
+          url: nuevo.url,
+          categoria: nuevo.categoria
+        }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.mensaje || `Error ${response.status}`);
+      }
+
       resetFormulario();
-      fetchAplicativos(); // Recargar lista
+      fetchAplicativos();
     } catch (err) {
-      console.error("Error al editar:", err);
+      console.error("Error al editar aplicativo:", err);
+      alert(`Error al editar aplicativo: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
   /**
-   * Elimina un aplicativo específico con confirmación
-   * @async
-   * @param {number} id - ID del aplicativo a eliminar
-   * @returns {Promise<void>}
+   * Elimina un aplicativo específico con confirmación (CORREGIDA)
    */
   const eliminarAplicativo = async (id: number) => {
     const token = getToken();
     if (!token) return;
     
-    // Confirmación de eliminación
     if (!window.confirm("¿Eliminar este aplicativo?")) return;
 
     try {
       const response = await fetch(`${API}/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       });
 
-      // Manejar errores HTTP
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          errorData.mensaje || `Error ${response.status}: ${response.statusText}`
-        );
+        throw new Error(errorData.mensaje || `Error ${response.status}`);
       }
 
       const result = await response.json();
       console.log("✅ Aplicativo eliminado:", result.mensaje);
-      fetchAplicativos(); // Recargar lista
+      fetchAplicativos();
     } catch (err) {
       console.error("❌ Error al eliminar aplicativo:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      alert(`Error al eliminar aplicativo: ${errorMessage}`);
+      alert(`Error al eliminar aplicativo: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
   /**
    * Elimina una categoría y todos sus aplicativos
-   * @param {string} cat - Nombre de la categoría a eliminar
    */
-  const eliminarCategoria = (cat: string) => {
-    // Confirmación de eliminación
+  const eliminarCategoria = async (cat: string) => {
     if (!window.confirm(`¿Eliminar la categoría "${cat}" y todos sus aplicativos?`))
       return;
     
-    // Filtrar aplicativos y categorías
-    setAplicativos(aplicativos.filter((a) => a.categoria !== cat));
-    const nuevas = categoriasDisponibles.filter((c) => c !== cat);
-    setCategoriasDisponibles(nuevas);
+    // ✅ CORRECCIÓN: Eliminamos los aplicativos de la categoría uno por uno
+    const aplicativosAEliminar = aplicativos.filter((a) => a.categoria === cat);
     
-    // Ajustar categoría seleccionada si era la eliminada
+    for (const aplicativo of aplicativosAEliminar) {
+      await eliminarAplicativo(aplicativo.id);
+    }
+    
+    // Actualizamos las categorías disponibles
+    const nuevasCategorias = categoriasDisponibles.filter((c) => c !== cat);
+    setCategoriasDisponibles(nuevasCategorias);
+    
     if (categoriaSeleccionada === cat) {
-      setCategoriaSeleccionada(nuevas[0] || "");
+      setCategoriaSeleccionada(nuevasCategorias[0] || "");
     }
   };
 
-  // --- MANEJADORES DE MODAL ---
-
-  /**
-   * Abre el modal en modo edición con los datos de un aplicativo
-   * @param {Aplicativo} a - Aplicativo a editar
-   */
+  // --- MANEJADORES DE MODAL --- (sin cambios)
   const abrirEditar = (a: Aplicativo) => {
     setNuevo({ nombre: a.nombre, url: a.url, categoria: a.categoria });
     setEditando(true);
@@ -333,9 +274,6 @@ const Aplicativos: React.FC = () => {
     setModalOpen(true);
   };
 
-  /**
-   * Abre el modal para agregar un nuevo aplicativo
-   */
   const abrirModalAplicativo = () => {
     setNuevo({ 
       nombre: "", 
@@ -348,18 +286,12 @@ const Aplicativos: React.FC = () => {
     setModalOpen(true);
   };
 
-  /**
-   * Abre el modal para crear una nueva categoría
-   */
   const abrirModalCategoria = () => {
     setOtraCategoria("");
     setModoModal("categoria");
     setModalOpen(true);
   };
 
-  /**
-   * Resetea el formulario y cierra el modal
-   */
   const resetFormulario = () => {
     setNuevo({ nombre: "", url: "", categoria: "" });
     setEditando(false);
@@ -367,19 +299,14 @@ const Aplicativos: React.FC = () => {
     setModalOpen(false);
   };
 
-  /**
-   * Función principal de guardado que maneja ambos modos del modal
-   */
   const handleGuardar = () => {
     if (modoModal === "aplicativo") {
-      // Modo aplicativo: crear o editar
       if (editando) {
         guardarEdicion();
       } else {
         agregarAplicativo();
       }
     } else {
-      // Modo categoría: crear nueva categoría
       if (!otraCategoria) return alert("Ingresa un nombre");
       if (!categoriasDisponibles.includes(otraCategoria)) {
         setCategoriasDisponibles((prev) => [...prev, otraCategoria]);
@@ -389,12 +316,7 @@ const Aplicativos: React.FC = () => {
     }
   };
 
-  // --- CÁLCULOS ---
-
-  /**
-   * Agrupa los aplicativos por categoría para la sidebar
-   * @type {Record<string, Aplicativo[]>}
-   */
+  // --- CÁLCULOS --- (sin cambios)
   const agrupados = (aplicativos || []).reduce(
     (acc: Record<string, Aplicativo[]>, a) => {
       const cat = a.categoria || "Sin categoría";
@@ -405,17 +327,13 @@ const Aplicativos: React.FC = () => {
     {} as Record<string, Aplicativo[]>
   );
 
-  /**
-   * Aplicativos filtrados por categoría seleccionada y término de búsqueda
-   * @type {Aplicativo[]}
-   */
   const aplicativosFiltrados = (
     agrupados[categoriaSeleccionada] || []
   ).filter((a) =>
     a.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
   );
 
-  // --- RENDER ---
+  // --- RENDER --- (sin cambios en el JSX)
   return (
     <div className="app-layout">
       {/* --- BARRA LATERAL --- */}
@@ -488,13 +406,11 @@ const Aplicativos: React.FC = () => {
                     <input type="checkbox" />
                   </td>
                   <td>
-                    {/* Icono del aplicativo desde favicon */}
                     <img
                       src={`${new URL(a.url).origin}/favicon.ico`}
                       alt={`Logo de ${a.nombre}`}
                       className="app-logo"
                       onError={(e) => {
-                        // Fallback a icono por defecto si favicon no existe
                         (e.target as HTMLImageElement).src = "/icono-app.png";
                       }}
                     />
@@ -507,7 +423,6 @@ const Aplicativos: React.FC = () => {
                   </td>
                   <td>
                     <div className="actions-cell">
-                      {/* Botón editar */}
                       <button
                         className="btn-icon edit"
                         title="Editar"
@@ -528,7 +443,6 @@ const Aplicativos: React.FC = () => {
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                       </button>
-                      {/* Botón eliminar */}
                       <button
                         className="btn-icon delete"
                         title="Eliminar"
@@ -556,7 +470,6 @@ const Aplicativos: React.FC = () => {
               ))}
             </tbody>
           </table>
-          {/* Mensaje cuando no hay resultados */}
           {aplicativosFiltrados.length === 0 && (
             <p className="empty-table-message">
               No se encontraron aplicativos
@@ -566,7 +479,7 @@ const Aplicativos: React.FC = () => {
         </div>
       </main>
 
-      {/* --- MODAL APLICATIVO --- */}
+      {/* --- MODALES --- */}
       <Modal 
         isOpen={modalOpen && modoModal === "aplicativo"} 
         onClose={resetFormulario}
@@ -624,7 +537,6 @@ const Aplicativos: React.FC = () => {
         </div>
       </Modal>
 
-      {/* --- MODAL CATEGORÍA --- */}
       <Modal 
         isOpen={modalOpen && modoModal === "categoria"} 
         onClose={resetFormulario}
