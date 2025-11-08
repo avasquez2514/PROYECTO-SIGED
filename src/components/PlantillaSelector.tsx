@@ -377,18 +377,21 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
 
         {/* Botones para seleccionar tipo de nota */}
         <div className="plantilla-buttons">
-          <button
-            className={`plantilla-button interna ${tipoNota === "interna" ? "active" : ""}`}
-            onClick={() => handleTipoNotaChange("interna")}
-          >
-            Nota Interna
-          </button>
+
           <button
             className={`plantilla-button publica ${tipoNota === "publica" ? "active" : ""}`}
             onClick={() => handleTipoNotaChange("publica")}
           >
             Nota Pública
           </button>
+          
+          <button
+            className={`plantilla-button interna ${tipoNota === "interna" ? "active" : ""}`}
+            onClick={() => handleTipoNotaChange("interna")}
+          >
+            Nota Interna
+          </button>
+
         </div>
 
         {/* Botones de utilidad (Copiar y Limpiar) */}
