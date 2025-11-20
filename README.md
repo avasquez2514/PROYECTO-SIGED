@@ -6,7 +6,7 @@
 
 ## ✨ Resumen del Proyecto
 
-Este proyecto consiste en el diseño e implementación de un **Sistema Web Integral** para el área de **Despacho B2B de Energía Integral Andina**, contratista de TIGO.
+Este proyecto consiste en el diseño e implementación de un **Sistema Web Integral** para el área de *Despacho B2B de Energía Integral Andina*, contratista de TIGO.
 
 El propósito principal es **automatizar y optimizar la gestión operativa** de procesos críticos que antes se realizaban manualmente, tales como el registro de notas, la asignación de rutas y el control de herramientas técnicas. La plataforma centraliza la información para mejorar la eficiencia operativa, fortalecer la trazabilidad y elevar la calidad del servicio.
 
