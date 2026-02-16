@@ -16,7 +16,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SIGED - Despacho-B2B",
   description: "Sistema Integral de Gestión de Despacho",
-  themeColor: "#1e88e5", // Añadido para el soporte de PWA
 };
 
 export default function RootLayout({
@@ -29,21 +28,27 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/icon-192x192.png" />
-        <meta name="theme-color" content="#0d131aff" />
+        {/* Actualizamos el color del tema para navegadores móviles a juego con el diseño oscuro */}
+        <meta name="theme-color" content="#020617" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body suppressHydrationWarning
         className={`
           ${geistSans.variable} ${geistMono.variable}
           antialiased
-          bg-[#f3f4f6]
+          /* Cambiamos a fondo oscuro profundo y texto claro por defecto */
+          bg-[#020617] 
+          text-slate-200
           min-h-screen
+          selection:bg-blue-500/30
         `}
       >
-        {children}
+        {/* Contenedor principal para organizar Sidebar y Contenido si lo necesitas después */}
+        <div className="relative flex min-h-screen overflow-hidden">
+            {children}
+        </div>
         <div id="modal-root" />
       </body>
     </html>
   );
 }
-
