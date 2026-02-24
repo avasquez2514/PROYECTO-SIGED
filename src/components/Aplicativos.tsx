@@ -63,7 +63,8 @@ interface NuevoAplicativo {
  * URL base de la API para operaciones CRUD de aplicativos
  * @constant {string}
  */
-const API = `http://localhost:4000/api/aplicativos`;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const API = `${API_BASE}/api/aplicativos`;
 
 /**
  * Componente principal de gestión de aplicativos
