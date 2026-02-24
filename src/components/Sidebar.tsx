@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
         <div>
           <h1 className="text-sm font-black tracking-[0.2em] text-white">DESPACHO B2B</h1>
-          <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Premium Console</p>
+          <p className="text-[9px] uppercase tracking-widest text-white font-bold">Premium Console</p>
         </div>
       </div>
 
@@ -67,14 +67,14 @@ const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         <div className="pt-4 pb-2 px-5">
-          <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Servicios</span>
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">Servicios</span>
         </div>
 
         {/* DESPACHO B2B CATEGORY */}
         <div>
           <button
             onClick={() => setDespachoOpen(!isDespachoOpen)}
-            className={`flex items-center justify-between px-5 py-3 rounded-xl transition-all group w-full text-left ${isDespachoOpen ? 'text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'}`}
+            className={`flex items-center justify-between px-5 py-3 rounded-xl transition-all group w-full text-left ${isDespachoOpen ? 'text-white' : 'text-white hover:bg-slate-800/50'}`}
           >
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-xl">hub</span>
@@ -85,10 +85,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 
           {isDespachoOpen && (
             <div className="mt-2 ml-4 space-y-1 border-l border-slate-800/50 pl-4">
-              <button onClick={() => onVistaEspecial("alarma")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+              <button onClick={() => onVistaEspecial("alarma")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                 <span className="material-symbols-outlined text-lg">notifications</span> Alarma
               </button>
-              <button onClick={() => onVistaEspecial("aplicativos")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+              <button onClick={() => onVistaEspecial("aplicativos")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                 <span className="material-symbols-outlined text-lg">apps</span> Aplicativos
               </button>
 
@@ -100,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               >
                 <button
                   ref={correoRef}
-                  className="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all"
+                  className="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-lg">mail</span>
@@ -140,25 +140,25 @@ const Sidebar: React.FC<SidebarProps> = ({
                 )}
               </div>
 
-              <button onClick={() => onVistaEspecial("novedadesAsesor")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+              <button onClick={() => onVistaEspecial("novedadesAsesor")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                 <span className="material-symbols-outlined text-lg">group</span> Novedades Asesor
               </button>
-              <button onClick={() => onVistaEspecial("notasRapidas")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+              <button onClick={() => onVistaEspecial("notasRapidas")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                 <span className="material-symbols-outlined text-lg">edit_note</span> Notas Rápidas
               </button>
 
               <div className="pt-2">
-                <span className="text-[9px] font-bold text-slate-600 uppercase px-4">Documentación</span>
-                <button onClick={() => onVistaEspecial("notasAvances")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+                <span className="text-[9px] font-bold text-white uppercase px-4">Documentación</span>
+                <button onClick={() => onVistaEspecial("notasAvances")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                   <span className="material-symbols-outlined text-lg">history</span> Avances
                 </button>
-                <button onClick={() => onVistaEspecial("plantillas")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+                <button onClick={() => onVistaEspecial("plantillas")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                   <span className="material-symbols-outlined text-lg">description</span> Plantillas Pública/Interna
                 </button>
-                <button onClick={() => onVistaEspecial("plantillasAdicionales")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+                <button onClick={() => onVistaEspecial("plantillasAdicionales")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                   <span className="material-symbols-outlined text-lg">library_books</span> Plantillas Adicionales
                 </button>
-                <button onClick={() => onVistaEspecial("notasConciliacion")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-white hover:bg-slate-800/30 w-full text-left transition-all">
+                <button onClick={() => onVistaEspecial("notasConciliacion")} className="flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-white hover:bg-slate-800/30 w-full text-left transition-all">
                   <span className="material-symbols-outlined text-lg">handshake</span> Conciliación
                 </button>
               </div>
@@ -169,7 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* --- FOOTER --- */}
       <div className="p-4 border-t border-slate-800/50 space-y-1">
-        <button className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 hover:text-white hover:bg-slate-800/20 transition-all w-full text-left">
+        <button className="flex items-center gap-3 px-3 py-3 rounded-xl text-white hover:bg-slate-800/20 transition-all w-full text-left">
           <span className="material-symbols-outlined text-xl">Ajustes</span>
           <span className="text-xs font-bold uppercase tracking-widest"></span>
         </button>

@@ -238,7 +238,7 @@ const NovedadesAsesor: React.FC<NovedadesAsesorProps> = ({ torre }) => {
         )}
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Nueva Novedad" onSave={manejarGuardar} showSaveButton={false}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Nueva Novedad">
         <div className="modal-body-custom">
           <textarea value={textoNovedad} onChange={(e) => setTextoNovedad(e.target.value)} placeholder="Describe la novedad aquí..." rows={6} className="novedad-textarea" />
 

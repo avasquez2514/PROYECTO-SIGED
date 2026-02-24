@@ -176,3 +176,56 @@ header .glass {
 .fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
+
+/* --- INDICADOR DE TORRE --- */
+.tower-indicator {
+  position: absolute;
+  top: 1.5rem;
+  right: 2.5rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 99px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.5s ease-out;
+  pointer-events: none;
+}
+
+.tower-indicator .tower-dot {
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #3b82f6;
+  animation: towerPulse 2s infinite;
+}
+
+@keyframes towerPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 8px #3b82f6;
+  }
+
+  50% {
+    transform: scale(1.4);
+    box-shadow: 0 0 16px #3b82f6;
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 8px #3b82f6;
+  }
+}
+
+.tower-indicator span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}

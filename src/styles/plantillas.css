@@ -33,7 +33,7 @@
 }
 
 .plantilla-card-premium {
-  background: #020617;
+  background: rgb(18 20 23 / 30%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 3rem;
@@ -175,26 +175,34 @@
 
 .textarea-p {
   width: 100%;
-  min-height: 200px;
-  background: #030712;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.8);
-  padding: 2rem;
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  min-height: 240px;
+  background: #ffffff;
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  border-radius: 16px;
+  color: #0f172a;
+  padding: 2.5rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.7;
   resize: vertical;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.4s ease;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .textarea-p::placeholder {
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(15, 23, 42, 0.4);
 }
 
 .textarea-p:focus {
+  transform: translateY(-2px);
   border-color: #3b82f6;
-  box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.05);
+  background: #ffffff;
+  box-shadow:
+    0 20px 40px -10px rgba(59, 130, 246, 0.2),
+    0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 /* Type Toggle */

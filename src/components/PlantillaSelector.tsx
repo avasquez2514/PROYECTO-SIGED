@@ -469,18 +469,19 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
           {/* Seleccionador de Tipo de Nota */}
           <div className="type-toggle-p">
             <button
-              className={`type-toggle-btn ${tipoNota === "interna" ? "active" : ""}`}
-              onClick={() => handleTipoNotaChange("interna")}
-            >
-              <span className="material-symbols-outlined">lock</span>
-              NOTA INTERNA
-            </button>
-            <button
               className={`type-toggle-btn ${tipoNota === "publica" ? "active" : ""}`}
               onClick={() => handleTipoNotaChange("publica")}
             >
               <span className="material-symbols-outlined">public</span>
               NOTA PÚBLICA
+            </button>
+
+            <button
+              className={`type-toggle-btn ${tipoNota === "interna" ? "active" : ""}`}
+              onClick={() => handleTipoNotaChange("interna")}
+            >
+              <span className="material-symbols-outlined">lock</span>
+              NOTA INTERNA
             </button>
           </div>
 

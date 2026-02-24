@@ -112,6 +112,14 @@ export default function Page() {
               <span className="text-9xl font-black tracking-tighter italic" style={{ fontSize: '12rem', color: 'rgba(255,255,255,0.05)' }}>A</span>
             </div>
 
+            {/* --- INDICADOR DE TORRE --- */}
+            {torre && (
+              <div className="tower-indicator">
+                <div className="tower-dot"></div>
+                <span>TORRE: {torre}</span>
+              </div>
+            )}
+
             {/* --- HEADER SUPERIOR --- */}
             {!pantallaBlanca && vista === "inicio" && (
               <header className="h-16 flex items-center justify-center px-8 z-10 mt-8">

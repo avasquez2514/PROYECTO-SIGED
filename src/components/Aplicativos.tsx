@@ -425,22 +425,17 @@ const Aplicativos: React.FC<AplicativosProps> = ({ torre }) => {
       <header className="header">
         <div className="header-title">Workspace / Dashboard</div>
 
+        <div className="search-box">
+          <span className="material-symbols-outlined icon">search</span>
+          <input
+            type="text"
+            placeholder="Buscar aplicativo..."
+            value={filtroNombre}
+            onChange={(e) => setFiltroNombre(e.target.value)}
+          />
+        </div>
+
         <div className="header-actions">
-          <div className="search-box">
-            <span className="material-symbols-outlined icon">search</span>
-            <input
-              type="text"
-              placeholder="Buscar aplicativo..."
-              value={filtroNombre}
-              onChange={(e) => setFiltroNombre(e.target.value)}
-            />
-          </div>
-
-          <div className="user-status">
-            <div className="status-dot"></div>
-            <span className="status-text">TORRE: {torre?.toUpperCase() || "COSTA"}</span>
-          </div>
-
           <div className="user-profile-btn" style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#1e293b", border: "1px solid #334155", overflow: "hidden" }}>
             <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="User" />
           </div>

@@ -132,7 +132,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .search-box {
