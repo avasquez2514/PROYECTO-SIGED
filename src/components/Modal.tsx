@@ -9,8 +9,8 @@ import "../styles/Modal.css";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: () => void;
-  showSaveButton: boolean;
+  onSave?: () => void;
+  showSaveButton?: boolean;
   children: React.ReactNode;
   title: string; // <-- Definición correcta
 }
@@ -19,10 +19,10 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
-  onSave,
+  onSave = () => { },
   children,
   title, // <-- 1. Faltaba recibir el title
-  showSaveButton, // <-- 2. Faltaba recibir el showSaveButton
+  showSaveButton = false, // <-- 2. Faltaba recibir el showSaveButton
 }) => {
   // 🛑 Si el modal no está abierto, no renderiza nada
   if (!isOpen) return null;
@@ -38,7 +38,7 @@ const Modal: React.FC<ModalProps> = ({
   return createPortal(
     <div className="modal-overlay">
       <div className="modal-content">
-        
+
         {/* --- ENCABEZADO CON TÍTULO Y BOTÓN DE CERRAR --- */}
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3> {/* <-- 3. Usando el title */}
