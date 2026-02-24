@@ -1,511 +1,379 @@
-/* PlantillaSelector - Diseño Moderno Actualizado */
+/* PlantillaSelector - Premium Edition (Reference Image Style) */
 
-/* Contenedor principal. Fija altura mínima y centra el contenido. Ocupa el 35% del ancho en escritorio. */
-.plantilla-container {
-  min-height: 67vh;
-  padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 35%;
-}
-
-/* Card Principal: Estilo oscuro con gradiente, borde sutil y sombra dramática */
-.plantilla-card {
-  background: linear-gradient(to right bottom, rgb(3 4 6), rgb(31 50 80), rgb(15, 23, 42)); /* Gradiente de fondo oscuro */
-  border: 1px solid #2d3748;
-  border-radius: 1rem;
-  padding: 2.5rem;
-  max-width: 900px;
+.plantilla-view-wrapper {
+  position: relative;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-/* Header: Contenedor flexible para alinear icono y texto */
-.plantilla-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-/* Icono del Header: Gradiente azul y sombra para destacarlo */
-.plantilla-header-icon {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  padding: 0.875rem;
-  border-radius: 0.75rem;
+  height: 100%;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-  color: white;
+  overflow: hidden;
+  background-color: transparent;
 }
 
-/* Contenedor de texto en el Header */
-.plantilla-header-text {
-  flex: 1;
+.plantilla-container-premium {
+  z-index: 10;
+  width: 100%;
+  max-width: 1000px;
+  padding: 2rem;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Título principal de la tarjeta */
-.plantilla-title {
-  color: #ffffff;
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Subtítulo descriptivo */
-.plantilla-subtitle {
-  color: #94a3b8; /* Gris claro */
-  font-size: 0.875rem;
-  margin: 0.25rem 0 0 0;
+.plantilla-card-premium {
+  background: #020617;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 3rem;
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+  position: relative;
 }
 
-/* Etiqueta de Categoría: Alineación flexible con el punto (bullet) */
-.plantilla-categoria-label {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
+/* Header */
+.plantilla-header-premium {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 }
 
-/* Punto de color para la categoría (indicador visual) */
-.categoria-bullet {
-  color: #3b82f6; /* Azul brillante */
-  font-size: 1.5rem;
+.header-icon-box-p {
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+}
+
+.header-icon-box-p .material-symbols-outlined {
+  font-size: 1.75rem;
+}
+
+.title-p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
   line-height: 1;
 }
 
-/* Select (menú desplegable) de Notas: Estilo oscuro personalizado */
-.plantilla-select {
+.subtitle-p {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Category Section */
+.category-section-p {
+  margin-bottom: 2rem;
+}
+
+.label-p {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #3b82f6;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.75rem;
+}
+
+.select-wrapper-p {
+  position: relative;
   width: 100%;
-  background: #0f1419;
-  border: 1px solid #2d3748;
-  color: #ffffff;
-  padding: 0.875rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+}
+
+.select-p {
+  width: 100%;
+  background: #0a0f1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  padding: 1.25rem 3.5rem 1.25rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  appearance: none;
   cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+
+.select-p:focus {
   outline: none;
-  transition: all 0.2s ease;
-  appearance: none; /* Elimina la flecha nativa */
-  /* Flecha SVG personalizada inyectada en el fondo */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1.5em;
-  padding-right: 3rem;
-  margin-bottom: 1.5rem;
-}
-
-/* Estilo al enfocar el Select */
-.plantilla-select:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #0d1428;
 }
 
-/* Estilo para las opciones del Select */
-.plantilla-select option {
-  background: #0f1419;
-  color: #ffffff;
-  padding: 0.5rem;
+.select-icon-p {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #3b82f6;
+  pointer-events: none;
+  font-size: 1.25rem;
 }
 
-/* Contenedor de Botones de Acción Superior: Disposición en 3 columnas */
-.plantilla-buttons-top {
+/* Actions Grid */
+.actions-grid-p {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-/* Textarea: Fondo claro para contraste con el card oscuro */
-.plantilla-textarea {
-  width: 100%;
-  min-height: 180px;
-  background: #f8f9fa;
-  border: 1px solid #e2e8f0;
-  color: #1e293b;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  resize: vertical;
-  outline: none;
-  transition: all 0.2s ease;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
-}
-
-/* Estilo al enfocar el Textarea */
-.plantilla-textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Contenedor de Botones Inferiores: Disposición en 2 columnas */
-.plantilla-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-/* Botones Base: Estilo común, transición y efectos hover */
-.plantilla-button {
-  padding: 0.75rem 1.25rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.action-btn-p {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  color: #fff;
+  padding: 1.25rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* Efecto hover: Ligero levantamiento */
-.plantilla-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.action-btn-p:hover {
+  background: #1f2937;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
-/* Efecto al hacer click */
-.plantilla-button:active {
-  transform: translateY(0);
+.action-btn-p .material-symbols-outlined {
+  font-size: 1.1rem;
 }
 
-/* Botones de acción (Agregar, Modificar, Eliminar, Copiar, Limpiar): Azul principal */
-.plantilla-button.agregar {
-  background: #2563eb;
-  color: white;
+/* Textarea */
+.textarea-section-p {
+  margin-bottom: 2rem;
 }
 
-.plantilla-button.agregar:hover {
-  background: #1d4ed8;
+.textarea-p {
+  width: 100%;
+  min-height: 200px;
+  background: #030712;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 2rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s;
 }
 
-.plantilla-button.modificar {
-  background: #2563eb;
-  color: white;
+.textarea-p::placeholder {
+  color: rgba(255, 255, 255, 0.15);
 }
 
-.plantilla-button.modificar:hover {
-  background: #1d4ed8;
+.textarea-p:focus {
+  border-color: #3b82f6;
+  box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.05);
 }
 
-.plantilla-button.eliminar {
-  background: #2563eb;
-  color: white;
+/* Type Toggle */
+.type-toggle-p {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-.plantilla-button.eliminar:hover {
-  background: #1d4ed8;
+.type-toggle-btn {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* Botones Tipo de Nota (Pública/Interna): Estilo oscuro/secundario */
-.plantilla-button.publica,
-.plantilla-button.interna {
-  background: #334155;
-  color: #94a3b8;
+.type-toggle-btn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+  box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.5);
 }
 
-/* Estado activo para botones de Tipo de Nota */
-.plantilla-button.publica.active,
-.plantilla-button.interna.active {
-  background: #475569;
-  color: white;
+/* Utility Grid */
+.utility-grid-p {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
-.plantilla-button.publica:hover,
-.plantilla-button.interna:hover {
-  background: #3f4f63;
+.util-btn-p {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* Botón Copiar */
-.plantilla-button.copy {
-  background: #2563eb;
-  color: white;
-}
-
-.plantilla-button.copy:hover {
-  background: #1d4ed8;
-}
-
-/* Botón Limpiar */
-.plantilla-button.clear {
-  background: #2563eb;
-  color: white;
-}
-
-.plantilla-button.clear:hover {
-  background: #1d4ed8;
-}
-
-/* Footer: Indicador de tipo de nota seleccionado */
-.plantilla-tipo-seleccionado {
-  font-size: 0.875rem;
-  color: #94a3b8;
-  text-align: center;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #2d3748;
-}
-
-/* Valor resaltado del tipo seleccionado */
-.plantilla-tipo-valor {
+.util-btn-p.copy {
   color: #3b82f6;
-  font-weight: 600;
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
-/* ---------------------------------- */
-/* Estilos para Modal (Ventana Emergente) */
-/* ---------------------------------- */
+.util-btn-p.copy:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
 
-/* Overlay del Modal: Fondo oscuro, fijo y con desenfoque (blur) */
+.util-btn-p.clear {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.util-btn-p.clear .material-symbols-outlined {
+  color: #ef4444;
+}
+
+.util-btn-p.clear:hover {
+  background: #1f2937;
+  color: #fff;
+}
+
+/* Global Watermark */
+.global-watermark-siged {
+  position: fixed;
+  bottom: 0rem;
+  right: 2rem;
+  font-size: 15vw;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+  user-select: none;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  z-index: 1;
+}
+
+@media (max-width: 640px) {
+  .plantilla-card-premium {
+    padding: 1.5rem;
+  }
+
+  .actions-grid-p {
+    grid-template-columns: 1fr;
+  }
+
+  .type-toggle-p,
+  .utility-grid-p {
+    grid-template-columns: 1fr;
+  }
+
+  .title-p {
+    font-size: 1.5rem;
+  }
+}
+
+/* Modal Premium */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease;
-}
-
-/* Animación de entrada del Overlay */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Contenido del Modal: Card oscuro con animación de deslizamiento */
-.modal-content {
-  background: #1a2332;
-  border-radius: 1rem;
-  width: 90%;
-  max-width: 600px;
-  max-height: 85vh;
-  overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-  animation: slideIn 0.3s ease;
-  border: 1px solid #2d3748;
-}
-
-/* Animación de entrada del Contenido del Modal (deslizamiento desde arriba) */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-50px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Encabezado del Modal */
-.modal-header {
-  background: linear-gradient(to right bottom, rgb(3 4 6), rgb(31 50 80), rgb(15, 23, 42));
   padding: 1.5rem;
-  border-bottom: 1px solid #2d3748;
+}
+
+.modal-content.glass {
+  background: #020617;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.9);
+  animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
-/* Título del Modal */
-.modal-header h2 {
-  color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
+.modal-body {
+  padding: 2rem;
 }
 
-/* Botón de Cierre del Modal */
-.modal-close-btn {
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.close-btn {
+  color: #64748b;
+  transition: color 0.2s;
   background: none;
   border: none;
-  color: #94a3b8;
-  font-size: 2rem;
   cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  transition: color 0.2s;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.375rem;
 }
 
-.modal-close-btn:hover {
-  color: white;
-}
-
-/* Cuerpo del Modal: Permite scroll vertical y tiene estilos de barra de desplazamiento */
-.modal-body {
-  padding: 1.5rem;
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-/* Estilos de la barra de desplazamiento (Scrollbar) */
-.modal-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-body::-webkit-scrollbar-track {
-  background: rgba(51, 65, 85, 0.3);
-  border-radius: 3px;
-}
-
-.modal-body::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.5);
-  border-radius: 3px;
-}
-
-/* Etiquetas de formulario en el Modal */
-.modal-body label {
-  display: block;
-  color: #cbd5e1;
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-  margin-top: 1rem;
-}
-
-.modal-body label:first-child {
-  margin-top: 0;
-}
-
-/* Campos de entrada e input en el Modal: Fondo oscuro y borde sutil */
-.modal-body input,
-.modal-body textarea {
-  width: 100%;
-  background: #0f1419;
-  border: 1px solid #2d3748;
-  color: #ffffff;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.modal-body textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-/* Estilo al enfocar los campos del Modal */
-.modal-body input:focus,
-.modal-body textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Pie de página del Modal con botones de acción */
-.modal-buttons {
-  padding: 1.5rem;
-  background: #0f1419;
-  border-top: 1px solid #2d3748;
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-}
-
-/* Botón Guardar (Verde) */
-.modal-save-button,
-.modal-delete-button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.modal-save-button {
-  background: #10b981;
-  color: white;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.modal-save-button:hover {
-  background: #059669;
-  transform: translateY(-1px);
-}
-
-/* Botón Eliminar (Rojo) */
-.modal-delete-button {
-  background: #ef4444;
-  color: white;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-}
-
-.modal-delete-button:hover {
-  background: #dc2626;
-  transform: translateY(-1px);
-}
-
-/* Estilos Responsivos para dispositivos pequeños (max-width: 768px) */
-@media (max-width: 768px) {
-  /* Reducción de padding */
-  .plantilla-container {
-    padding: 1rem;
-  }
-
-  .plantilla-card {
-    padding: 1.5rem;
-  }
-
-  .plantilla-title {
-    font-size: 1.5rem;
-  }
-
-  /* Botones de acción y superiores a una sola columna */
-  .plantilla-buttons,
-  .plantilla-buttons-top {
-    grid-template-columns: 1fr;
-  }
-
-  /* Ajuste del Modal para ocupar casi todo el ancho */
-  .modal-content {
-    width: 95%;
-    margin: 1rem;
-  }
-
-  /* Botones del Modal apilados verticalmente */
-  .modal-buttons {
-    flex-direction: column;
-  }
-
-  .modal-save-button,
-  .modal-delete-button {
-    width: 100%;
-    justify-content: center;
-  }
+.close-btn:hover {
+  color: #fff;
 }

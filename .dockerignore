@@ -1,0 +1,12 @@
+# Carpetas y archivos que Docker debe ignorar al construir la imagen
+# para que sea más pequeña y segura.
+
+node_modules
+npm-debug.log*
+.git
+.gitignore
+.vercel
+.env          # ¡IMPORTANTE! No incluyas variables sensibles en la imagen.
+.DS_Store
+# Archivos de caché o temporales de Next.js (ya manejados en .next)
+.next/cache

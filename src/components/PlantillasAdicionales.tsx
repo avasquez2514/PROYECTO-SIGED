@@ -1,7 +1,6 @@
 "use client";
 
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa";
 import "../styles/plantillasAdicionales.css";
 import Modal from "./Modal";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
@@ -65,6 +64,30 @@ const PlusIcon = () => (
   </svg>
 );
 
+const CopyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+    <path d="M10 11v6"></path>
+    <path d="M14 11v6"></path>
+    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+  </svg>
+);
+
 /**
  * Componente principal para gestionar plantillas de texto adicionales
  * Permite crear, editar, eliminar, copiar y reordenar plantillas mediante drag & drop
@@ -74,37 +97,37 @@ const PlusIcon = () => (
  */
 const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) => {
   // --- ESTADOS DEL COMPONENTE ---
-  
+
   /**
    * Estado que almacena la lista completa de plantillas
    * @state {Plantilla[]}
    */
   const [plantillas, setPlantillas] = useState<Plantilla[]>([]);
-  
+
   /**
    * Estado que almacena el orden de las plantillas para persistencia
    * @state {string[]}
    */
   const [ordenPlantillas, setOrdenPlantillas] = useState<string[]>([]);
-  
+
   /**
    * Estado que controla la visibilidad del modal de edición
    * @state {boolean}
    */
   const [modalOpen, setModalOpen] = useState(false);
-  
+
   /**
    * Estado que indica el modo de operación del modal (agregar o editar)
    * @state {"agregar" | "editar"}
    */
   const [modo, setModo] = useState<"agregar" | "editar">("agregar");
-  
+
   /**
    * Estado que indica si se están cargando datos desde la API
    * @state {boolean}
    */
   const [loading, setLoading] = useState(true);
-  
+
   /**
    * Estado que controla la visibilidad del formulario de nueva plantilla
    * @state {boolean}
@@ -139,7 +162,7 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
     const token = localStorage.getItem("token");
     const usuarioRaw = localStorage.getItem("usuario");
     const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
-    
+
     // Validar que exista autenticación
     if (!token || !usuario?.id) return;
 
@@ -272,14 +295,14 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
           window.location.href = "/login";
           return;
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.mensaje || `Error ${response.status}: ${response.statusText}`);
       }
 
       const result = await response.json();
       console.log("✅ Plantilla eliminada:", result.mensaje);
-      
+
       // Recargar la lista de plantillas
       await cargarPlantillas();
     } catch (error) {
@@ -364,7 +387,7 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
           window.location.href = "/login";
           return;
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.mensaje || `Error ${response.status}: ${response.statusText}`);
       }
@@ -382,6 +405,7 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
 
   /**
    * Guarda los cambios de una plantilla editada a través de la API
+   * Esta función será mapeada al 'onSave' del Modal.
    * @async
    * @function
    * @returns {Promise<void>}
@@ -415,7 +439,7 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
           window.location.href = "/login";
           return;
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.mensaje || `Error ${response.status}: ${response.statusText}`);
       }
@@ -437,12 +461,12 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
   const onDragEnd = (result: DropResult) => {
     // Validar que haya un destino válido
     if (!result.destination) return;
-    
+
     // Obtener índices de origen y destino
     const items = Array.from(ordenPlantillas);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-    
+
     // Actualizar el estado con el nuevo orden
     setOrdenPlantillas(items);
   };
@@ -472,7 +496,7 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
               <p>Gestiona tus plantillas de texto personalizadas</p>
             </div>
           </div>
-          
+
           {/* Botón para agregar nueva plantilla */}
           <button className="agregar-button" onClick={abrirFormularioAgregar}>
             <PlusIcon />
@@ -555,15 +579,15 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
                                 onClick={() => copiarPlantilla(plantilla.texto)}
                                 title="Copiar"
                               >
-                                📋 Copiar
+                                <CopyIcon /> COPIAR
                               </button>
-                              {/* Botón modificar */}
+                              {/* Botón editar */}
                               <button
                                 className="plantilla-button edit"
                                 onClick={() => abrirModalEditar(plantilla)}
-                                title="Modificar"
+                                title="Editar"
                               >
-                                ✏️ Modificar
+                                <EditIcon /> EDITAR
                               </button>
                               {/* Botón eliminar */}
                               <button
@@ -571,7 +595,7 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
                                 onClick={() => eliminarPlantilla(plantilla.id)}
                                 title="Eliminar"
                               >
-                                🗑️ Eliminar
+                                <TrashIcon /> ELIMINAR
                               </button>
                             </div>
                           </div>
@@ -596,43 +620,52 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
             {/* Footer con contador de plantillas */}
             <div className="plantilla-footer">
               <p>
-                Total de plantillas: <span>{plantillasOrdenadas.length}</span>
+                TOTAL DE PLANTILLAS: <span>{plantillasOrdenadas.length}</span>
               </p>
             </div>
           </>
         )}
       </div>
 
-      {/* Modal para editar plantillas */}
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-        <h2>Modificar Plantilla</h2>
-
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={guardarPlantillaModal}
+        showSaveButton={false}
+        title={"Modificar Plantilla"}
+      >
         {/* Campo para el título de la plantilla */}
-        <label>Título</label>
-        <input
-          type="text"
-          name="nombre"
-          value={formData.nombre}
-          onChange={manejarCambio}
-        />
+        <div className="form-section">
+          <label className="section-label">Título de la plantilla</label>
+          <input
+            className="form-input"
+            type="text"
+            name="nombre"
+            value={formData.nombre}
+            onChange={manejarCambio}
+            placeholder="Escribe el título..."
+          />
+        </div>
 
         {/* Campo para el contenido de la plantilla */}
-        <label>Contenido</label>
-        <textarea
-          rows={5}
-          name="texto"
-          value={formData.texto}
-          onChange={manejarCambio}
-        />
+        <div className="form-section">
+          <label className="section-label">Contenido</label>
+          <textarea
+            className="novedad-textarea"
+            rows={6}
+            name="texto"
+            value={formData.texto}
+            onChange={manejarCambio}
+            placeholder="Escribe el contenido..."
+            style={{ resize: "vertical", minHeight: "140px", fontFamily: "inherit" }}
+          />
+        </div>
 
         {/* Botones de acción del modal */}
         <div className="modal-buttons">
-          {/* Botón para guardar cambios */}
           <button onClick={guardarPlantillaModal} className="modal-save-button">
             Actualizar
           </button>
-
-          {/* Botón para eliminar plantilla */}
           <button
             onClick={() => {
               eliminarPlantilla(formData.id);
@@ -640,7 +673,7 @@ const PlantillasAdicionales: React.FC<PlantillasAdicionalesProps> = ({ torre }) 
             }}
             className="modal-delete-button"
           >
-            <FaTrash style={{ marginRight: "6px" }} />
+            <TrashIcon />
             Eliminar
           </button>
         </div>

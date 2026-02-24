@@ -10,6 +10,8 @@ import { TextStyle } from "@tiptap/extension-text-style"; // Extensión base par
 import Color from "@tiptap/extension-color"; // Extensión para manejar el color del texto.
 import FontFamily from "@tiptap/extension-font-family"; // ✅ NUEVO IMPORT: Extensión para seleccionar la fuente del texto.
 import { useCallback, useEffect, useState } from "react"; // Hooks de React.
+import { EditorView } from 'prosemirror-view'; // Importación necesaria para el tipado de ProseMirror
+import { Slice } from 'prosemirror-model'; // Importación necesaria para el tipado de ProseMirror
 
 // --- Importaciones de Librerías y Hooks Personalizados ---
 import interact from "interactjs"; // Librería para interacciones (arrastrar, redimensionar elementos).
@@ -200,7 +202,8 @@ export default function RichTextEditor({
     editorProps: {
       attributes: { class: "editor-content" }, // Clase CSS para el área de edición.
       // Manejador personalizado para el evento de pegar contenido.
-      handlePaste: async (view, event) => {
+      // --- INICIO DEL CÓDIGO CORREGIDO ---
+      handlePaste: (view: EditorView, event: ClipboardEvent, slice: Slice) => {
         const clipboardData = event.clipboardData;
         if (!clipboardData) return false; // No hay datos de portapapeles.
 
@@ -215,23 +218,36 @@ export default function RichTextEditor({
             // Validación de tamaño máximo (5MB).
             if (file.size > 5 * 1024 * 1024) {
               alert("La imagen es demasiado grande (máx 5MB).");
-              return true; // Bloquea la acción por defecto.
+              return true; // Bloquea la acción por defecto y maneja el evento.
             }
 
-            const imageUrl = await uploadImage(file); // Sube la imagen a Supabase.
-            if (imageUrl) {
-              // Inserta la imagen en el editor usando la URL pública.
-              editor
-                ?.chain()
-                .focus()
-                .setImage({ src: imageUrl, alt: "Imagen subida" })
-                .run();
-            } else {
-              alert("Error al subir imagen desde el portapapeles.");
-            }
+            // Capturamos la posición actual de la selección para insertar el nodo
+            const pos = view.state.tr.selection.from;
+
+            // Subimos la imagen de forma asíncrona y luego la insertamos.
+            uploadImage(file).then(imageUrl => {
+                if (imageUrl && editor) {
+                    // Creamos un nodo de imagen y lo insertamos en la posición capturada
+                    const imageNode = editor.schema.nodes.image.create({ 
+                        src: imageUrl, 
+                        alt: "Imagen subida" 
+                    });
+                    
+                    // Creamos y despachamos la transacción
+                    const transaction = view.state.tr.insert(pos, imageNode);
+                    view.dispatch(transaction);
+                } else {
+                    alert("Error al subir imagen desde el portapapeles.");
+                }
+            }).catch(err => {
+                console.error("Error al manejar la subida de imagen pegada:", err);
+                alert("Error al subir imagen desde el portapapeles.");
+            });
           }
-          return true; // Indica que el evento fue manejado.
+          return true; // Indica que el evento fue manejado (importante para el flujo asíncrono).
         }
+        // --- FIN DEL CÓDIGO CORREGIDO ---
+
 
         // --- Manejo de pegado de HTML (Tablas de Word/Web) ---
         const htmlData = clipboardData.getData("text/html");

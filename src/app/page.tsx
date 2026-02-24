@@ -72,7 +72,7 @@ export default function Page() {
   const handleAbrirMenuConTorre = () => {
     setMenuOpen(true);
     // 🚀 La función que elimina el Sidebar ahora se llama desde el botón "Let's talk"
-    handleSelectTipoNota("DESPACHO B2B"); 
+    handleSelectTipoNota("DESPACHO B2B");
   };
 
   // Maneja la selección de torre
@@ -92,14 +92,6 @@ export default function Page() {
         <LoginRegistro onLogin={setUsuario} />
       ) : (
         <>
-       
-
-          {torre && (
-            <div className="torre-fija">
-              TU TORRE ES: <span className="torre-etiqueta">{torre}</span>
-            </div>
-          )}
-
           <Sidebar
             onSelectTipoNota={handleSelectTipoNota}
             isOpen={menuOpen}
@@ -109,73 +101,94 @@ export default function Page() {
             modoB2B={modoB2B}
             onVolverInicio={handleInicioClick}
             cerrarSesion={cerrarSesion}
-            // Estas props no están definidas en el Sidebar original que me pasaste,
-            // pero las mantengo por si las tienes en otro archivo:
-            // despachoOpen={despachoOpen}
-            // setDespachoOpen={setDespachoOpen}
           />
 
-          <div className="main-container">
+          <main className="main-container bg-mesh">
+            {/* --- DECORACIONES DE FONDO --- */}
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px] -z-10"></div>
+
+            <div className="absolute bottom-12 right-12 select-none pointer-events-none metallic-logo">
+              <span className="text-9xl font-black tracking-tighter italic" style={{ fontSize: '12rem', color: 'rgba(255,255,255,0.05)' }}>A</span>
+            </div>
+
+            {/* --- HEADER SUPERIOR --- */}
+            {!pantallaBlanca && vista === "inicio" && (
+              <header className="h-16 flex items-center justify-center px-8 z-10 mt-8">
+                <div className="glass px-6 py-2 rounded-full flex items-center gap-8 border-slate-700/30">
+                  <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/90 hover:text-primary transition-colors cursor-pointer border-none bg-transparent" onClick={handleInicioClick}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>home</span> HOME
+                  </button>
+                  <div className="h-4 w-[1px] bg-slate-700/50"></div>
+                  <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors cursor-pointer border-none bg-transparent" onClick={cerrarSesion}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>shield</span> ABOUT
+                  </button>
+                </div>
+              </header>
+            )}
+
             {mostrarSelector ? (
               <TorreSelector onSelect={handleTorreSeleccionadaConSubmenu} />
             ) : mostrarBienvenida ? (
-              // Pantalla de bienvenida elegante (Versión 17)
-              <div className="welcome-container">
+              <div className="welcome-container fade-in">
                 <div className="welcome-content">
-                  <div className="welcome-text-section">
-                    <h1 className="welcome-title">
-                      BIENVENIDO {usuario.nombre?.toUpperCase()}
-                    </h1>
-                    <p className="welcome-subtitle">
-                      Haz click en el botón para seleccionar tu torre
-                    </p>
-                  </div>
+                  <h2 className="welcome-title text-neon-glow leading-tight">
+                    BIENVENIDO {usuario.nombre?.toUpperCase()}
+                  </h2>
+                  <p className="welcome-subtitle uppercase tracking-[0.2em] opacity-60">
+                    Haz click en el botón para seleccionar tu torre
+                  </p>
 
                   <button
-                    onClick={handleAbrirMenuConTorre} // Llama a la función que ahora incluye handleSelectTipoNota
-                    className="welcome-button"
+                    onClick={handleAbrirMenuConTorre}
+                    className="welcome-button glass glass-hover group"
                   >
-                    Selecciona tu torre
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
+                    <span className="text-sm font-bold uppercase tracking-[0.2em] text-white/90">Selecciona tu torre</span>
+                    <span className="material-symbols-outlined text-primary transition-transform group-hover:translate-x-2">arrow_forward</span>
                   </button>
                 </div>
               </div>
-            ) : pantallaBlanca ? (
-              <div className="pantalla-blanca"></div>
-            ) : vista === "inicio" ? (
-              <h1 className="title">BIENVENID@, {usuario.nombre?.toUpperCase()}</h1>
-            ) : modoB2B && !torre ? (
-              <TorreSelector onSelect={handleTorreSeleccionadaConSubmenu} />
-            ) : vistaEspecial === "notasAvances" ? (
-              <NotasAvances torre={torre}/>
-            ) : vistaEspecial === "notasConciliacion" ? (
-              <NotasConciliacion torre={torre} />
-            ) : vistaEspecial === "notasSeguimiento" ? (
-              <PlantillaSelector torre={torre} onSelect={() => {}} />
-            ) : vistaEspecial === "plantillasAdicionales" ? (
-              <PlantillasAdicionales torre={torre} />
-            ) : vistaEspecial === "envioInicio" ||
-              vistaEspecial === "envioCierre" ||
-              vistaEspecial === "envioApertura" ||
-              vistaEspecial === "envioPermisos" ? (
-              <EnvioCorreos tipo={vistaEspecial} />
-            ) : vistaEspecial === "alarma" ? (
-              <Alarma />
-            ) : vistaEspecial === "aplicativos" ? (
-              <Aplicativos />
-            ) : vistaEspecial === "novedadesAsesor" ? (
-              <NovedadesAsesor />
-            ) : vistaEspecial === "notasRapidas" ? (
-              <NotasRapidas />
             ) : (
-              !modoB2B && !torre && tipoNota && (
-                <TorreSelector onSelect={handleTorreSeleccionadaConSubmenu} />
-              )
+              // Contenido restante...
+              <div className="flex-1 w-full overflow-auto">
+                {pantallaBlanca ? (
+                  <div className="pantalla-blanca"></div>
+                ) : vista === "inicio" ? (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <h1 className="welcome-title text-neon-glow">HOLA, {usuario.nombre?.toUpperCase()}</h1>
+                  </div>
+                ) : modoB2B && !torre ? (
+                  <TorreSelector onSelect={handleTorreSeleccionadaConSubmenu} />
+                ) : vistaEspecial === "notasAvances" ? (
+                  <NotasAvances torre={torre} />
+                ) : vistaEspecial === "notasConciliacion" ? (
+                  <NotasConciliacion torre={torre} />
+                ) : vistaEspecial === "notasSeguimiento" || vistaEspecial === "plantillas" ? (
+                  <PlantillaSelector torre={torre} onSelect={() => { }} />
+                ) : vistaEspecial === "plantillasAdicionales" ? (
+                  <PlantillasAdicionales torre={torre} />
+                ) : vistaEspecial === "envioInicio" ||
+                  vistaEspecial === "envioCierre" ||
+                  vistaEspecial === "envioApertura" ||
+                  vistaEspecial === "envioPermisos" ? (
+                  <EnvioCorreos tipo={vistaEspecial} />
+                ) : vistaEspecial === "alarma" ? (
+                  <Alarma />
+                ) : vistaEspecial === "aplicativos" ? (
+                  <Aplicativos torre={torre} />
+                ) : vistaEspecial === "novedadesAsesor" ? (
+                  <NovedadesAsesor torre={torre || ""} />
+                ) : vistaEspecial === "notasRapidas" ? (
+                  <NotasRapidas />
+                ) : (
+                  !modoB2B && !torre && tipoNota && (
+                    <TorreSelector onSelect={handleTorreSeleccionadaConSubmenu} />
+                  )
+                )}
+              </div>
             )}
-          </div>
+          </main>
+
         </>
       )}
     </div>

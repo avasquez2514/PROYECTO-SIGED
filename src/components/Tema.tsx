@@ -12,8 +12,8 @@ const Tema = () => {
   useEffect(() => {
     const savedTheme = localStorage.getItem("tema");
     const isDark = savedTheme === "oscuro";
-    
-    setDarkMode(isDark); 
+
+    setDarkMode(isDark);
 
     // Aplica la clase correcta al <body> para la carga inicial
     if (isDark) {
@@ -21,18 +21,18 @@ const Tema = () => {
     } else {
       document.body.classList.remove(TEMA_CLASS);
     }
-  }, []); 
+  }, []);
 
   // 2. useEffect de Cambio: Aplica el nuevo tema y lo guarda.
   useEffect(() => {
     if (darkMode) {
-      document.body.classList.add(TEMA_CLASS); 
+      document.body.classList.add(TEMA_CLASS);
       localStorage.setItem("tema", "oscuro");
     } else {
-      document.body.classList.remove(TEMA_CLASS); 
+      document.body.classList.remove(TEMA_CLASS);
       localStorage.setItem("tema", "claro");
     }
-  }, [darkMode]); 
+  }, [darkMode]);
 
   const toggleTheme = () => {
     setDarkMode(d => !d);
@@ -41,10 +41,12 @@ const Tema = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="nav-item nav-item-theme" // Clases para integrarse en la navbar
+      className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors border-none bg-transparent cursor-pointer"
       title="Cambiar tema"
     >
-      <span className="tema-icon">{darkMode ? "🌙" : "☀️"}</span>
+      <span className={`material-symbols-outlined text-sm ${darkMode ? "text-primary" : "text-amber-400"}`}>
+        {darkMode ? "dark_mode" : "light_mode"}
+      </span>
       <span>{darkMode ? "Oscuro" : "Claro"}</span>
     </button>
   );

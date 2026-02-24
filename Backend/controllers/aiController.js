@@ -60,10 +60,10 @@ const mejorarTextoChatGPT = async (req, res) => {
             systemInstruction = "Eres un asistente de redacción experto. Pulirás y mejorarás el texto proporcionado, asegurando claridad, cohesión y un tono profesional o adecuado para una nota rápida. No lo hagas excesivamente largo. Devuelve solo el texto mejorado.";
             userPrompt = `Mejora y pule este texto: "${texto}"`;
         }
-        
+
         // Llamada al modelo Gemini
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-09-2025",
+            model: "gemini-1.5-flash",
             contents: [{ parts: [{ text: userPrompt }] }],
             config: {
                 systemInstruction: {
@@ -71,7 +71,7 @@ const mejorarTextoChatGPT = async (req, res) => {
                 }
             }
         });
-        
+
         // Extracción segura del texto de respuesta
         const improvedText = response.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar una respuesta.";
 
@@ -120,15 +120,17 @@ const extraerTextoImagen = async (req, res) => {
         /** Rol: Transcriptor y corrector. Tarea: 1. Transcribir. 2. Corregir. 3. Devolver SOLO el texto final. */
         const systemInstruction = "Eres un asistente de transcripción y corrección. Tu tarea es: 1. Transcribir con precisión todo el texto que encuentres en la imagen. 2. Una vez transcrito, corrige inmediatamente los errores ortográficos, gramaticales y de puntuación del texto. **3. Devuelve *SOLO* el texto final**, corregido y transcrito, sin añadir preámbulos, explicaciones o comentarios adicionales.";
         const userPrompt = "Extrae y corrige el texto de esta imagen. Si no hay texto, indica 'No se pudo extraer texto relevante'.";
-        
+
         // 3. Llamada a la API de Gemini (Input: Imagen + Texto)
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-09-2025", 
+            model: "gemini-1.5-flash",
             contents: [
-                { parts: [
-                    imagePart,      // El componente de la imagen
-                    { text: userPrompt } // El componente de la instrucción
-                ] }
+                {
+                    parts: [
+                        imagePart,      // El componente de la imagen
+                        { text: userPrompt } // El componente de la instrucción
+                    ]
+                }
             ],
             config: {
                 systemInstruction: {
@@ -146,9 +148,9 @@ const extraerTextoImagen = async (req, res) => {
 
     } catch (error) {
         console.error("Error al interactuar con Gemini (imagen):", error.message);
-        res.status(500).json({ 
-            error: 'Fallo en el servicio de IA al procesar la imagen.', 
-            details: error.message 
+        res.status(500).json({
+            error: 'Fallo en el servicio de IA al procesar la imagen.',
+            details: error.message
         });
     }
 };

@@ -55,11 +55,11 @@ interface ArchivoAdjunto {
  * @param {FirmaProps} props - Props del componente
  * @returns {JSX.Element | null} Componente de firma o null si no está activo
  */
-const Firma: React.FC<FirmaProps> = ({ 
-  nombrePersonalizado, 
-  incluirFirma, 
-  onToggleFirma, 
-  onNombreChange 
+const Firma: React.FC<FirmaProps> = ({
+  nombrePersonalizado,
+  incluirFirma,
+  onToggleFirma,
+  onNombreChange
 }) => {
   // Si no se incluye firma, no renderizar nada
   if (!incluirFirma) return null;
@@ -93,55 +93,55 @@ const Firma: React.FC<FirmaProps> = ({
  */
 const EnvioCorreos: React.FC<EnvioCorreosProps> = ({ tipo }) => {
   // --- ESTADOS DEL FORMULARIO ---
-  
+
   /**
    * Estado para destinatarios principales del correo
    * @state {string}
    */
   const [para, setPara] = useState("");
-  
+
   /**
    * Estado para destinatarios en copia
    * @state {string}
    */
   const [cc, setCc] = useState("");
-  
+
   /**
    * Estado para el asunto del correo
    * @state {string}
    */
   const [asunto, setAsunto] = useState("");
-  
+
   /**
    * Estado para el cuerpo del mensaje
    * @state {string}
    */
   const [mensaje, setMensaje] = useState("");
-  
+
   /**
    * Estado para el título del componente según el tipo
    * @state {string}
    */
   const [titulo, setTitulo] = useState("");
-  
+
   /**
    * Estado para la lista de archivos adjuntos
    * @state {ArchivoAdjunto[]}
    */
   const [archivos, setArchivos] = useState<ArchivoAdjunto[]>([]);
-  
+
   /**
    * Estado para controlar la visualización de la vista previa
    * @state {boolean}
    */
   const [mostrarVistaPrevia, setMostrarVistaPrevia] = useState(false);
-  
+
   /**
    * Estado para incluir o no la firma en el correo
    * @state {boolean}
    */
   const [incluirFirma, setIncluirFirma] = useState(false);
-  
+
   /**
    * Estado para el nombre personalizado en la firma
    * @state {string}
@@ -149,25 +149,25 @@ const EnvioCorreos: React.FC<EnvioCorreosProps> = ({ tipo }) => {
   const [nombrePersonalizado, setNombrePersonalizado] = useState("Anderson Vasquez Gonzalez");
 
   // --- ESTADOS PARA FECHAS FORMATEADAS ---
-  
+
   /**
    * Estado para fecha actual en formato DD-MM-YYYY
    * @state {string}
    */
   const [fechaHoyGuiones, setFechaHoyGuiones] = useState("");
-  
+
   /**
    * Estado para fecha actual en formato YYYY_MM_DD
    * @state {string}
    */
   const [fechaHoyGuionesBajo, setFechaHoyGuionesBajo] = useState("");
-  
+
   /**
    * Estado para fecha de mañana en formato DD-MM-YYYY
    * @state {string}
    */
   const [fechaMananaGuiones, setFechaMananaGuiones] = useState("");
-  
+
   /**
    * Estado para fecha de mañana en formato YYYY_MM_DD
    * @state {string}
@@ -314,7 +314,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
    * @param {string} texto - Texto a copiar
    */
   const copiarTexto = (texto: string) => navigator.clipboard.writeText(texto);
-  
+
   /**
    * Copia todo el contenido del formulario al portapapeles
    */
@@ -322,7 +322,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
     const textoCompleto = `Para:\n${para}\n\nCC:\n${cc}\n\nAsunto:\n${asunto}\n\n${mensaje}`;
     navigator.clipboard.writeText(textoCompleto);
   };
-  
+
   /**
    * Guarda el estado actual del formulario en localStorage
    */
@@ -331,7 +331,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
     localStorage.setItem(`correos_${tipo}`, JSON.stringify(data));
     alert("Información guardada");
   };
-  
+
   /**
    * Limpia todos los campos del formulario
    */
@@ -343,7 +343,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
       setAsunto('');
       setMensaje('');
       setArchivos([]);
-      
+
       // Forzar el foco en el textarea después de limpiar
       setTimeout(() => {
         const textarea = document.querySelector('.mensaje-con-tablas') as HTMLTextAreaElement;
@@ -352,7 +352,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
           textarea.disabled = false;
         }
       }, 200);
-      
+
       alert("Formulario limpiado");
     }, 100);
   };
@@ -423,7 +423,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
   const manejarPegadoTablas = (event: React.ClipboardEvent) => {
     const clipboardData = event.clipboardData;
     const pastedData = clipboardData.getData('text/html') || clipboardData.getData('text/plain');
-    
+
     if (pastedData.includes('<table') || pastedData.includes('\t')) {
       // Es una tabla HTML o datos tabulares
       event.preventDefault();
@@ -444,35 +444,35 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
       const parser = new DOMParser();
       const doc = parser.parseFromString(data, 'text/html');
       const table = doc.querySelector('table');
-      
+
       if (table) {
         let tablaHTML = '<div style="margin: 15px 0; display: inline-block;">';
-        
+
         // Buscar título antes de la tabla
-        const titulo = table.previousSibling?.textContent?.trim() || 
-                      table.parentElement?.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim() ||
-                      '';
-        
+        const titulo = table.previousSibling?.textContent?.trim() ||
+          table.parentElement?.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim() ||
+          '';
+
         if (titulo && titulo.toUpperCase() === titulo && titulo.length > 3) {
           tablaHTML += `<h3 style="color: #1a73e8; font-weight: bold; text-align: center; margin-bottom: 10px; font-size: 16px; margin-top: 0;">${titulo}</h3>`;
         }
-        
+
         tablaHTML += '<table style="border-collapse: collapse; width: auto; max-width: 400px; font-family: Arial, sans-serif; margin: 0 auto;">';
-        
+
         const filas = table.querySelectorAll('tr');
         filas.forEach((fila) => {
           const celdas = fila.querySelectorAll('td, th');
-          const esFilaTotal = Array.from(celdas).some(celda => 
+          const esFilaTotal = Array.from(celdas).some(celda =>
             celda.textContent?.toLowerCase().includes('total')
           );
-          
+
           tablaHTML += '<tr>';
           celdas.forEach((celda, celdaIndex) => {
             const texto = celda.textContent?.trim() || '';
             const esTitulo = celda.tagName === 'TH';
-            
+
             let estilo = 'padding: 6px 10px; border: 1px solid #000; font-size: 13px; ';
-            
+
             if (esTitulo) {
               estilo += 'background-color: #1a73e8; color: white; font-weight: bold; text-align: center;';
             } else if (esFilaTotal) {
@@ -480,85 +480,85 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
             } else {
               estilo += 'background-color: #e8f0fe;';
             }
-            
+
             // Alineación de texto
             if (celdaIndex === celdas.length - 1 && texto.includes('$')) {
               estilo += ' text-align: right;';
             } else {
               estilo += ' text-align: left;';
             }
-            
+
             tablaHTML += `<td style="${estilo}">${texto}</td>`;
           });
           tablaHTML += '</tr>';
         });
-        
+
         tablaHTML += '</table></div>';
         return tablaHTML;
       }
     }
-    
+
     // Si es texto plano con tabs o espacios, convertir a HTML
     if (data.includes('\t') || data.includes('  ')) {
       const lineas = data.split('\n');
       let tablaHTML = '<div style="margin: 15px 0; display: inline-block;">';
       let titulo = '';
       const filasDatos: string[][] = [];
-      
+
       lineas.forEach((linea, index) => {
         if (linea.trim()) {
           const partes = linea.split('\t').map(p => p.trim());
           const primeraParte = partes[0] || '';
-          
+
           // Detectar título
-          if (primeraParte === primeraParte.toUpperCase() && 
-              primeraParte.length > 3 && 
-              !primeraParte.includes('$') &&
-              !primeraParte.toLowerCase().includes('total') &&
-              index === 0) {
+          if (primeraParte === primeraParte.toUpperCase() &&
+            primeraParte.length > 3 &&
+            !primeraParte.includes('$') &&
+            !primeraParte.toLowerCase().includes('total') &&
+            index === 0) {
             titulo = primeraParte;
           } else {
             filasDatos.push(partes);
           }
         }
       });
-      
+
       // Agregar título si existe
       if (titulo) {
         tablaHTML += `<h3 style="color: #1a73e8; font-weight: bold; text-align: center; margin-bottom: 10px; font-size: 16px; margin-top: 0;">${titulo}</h3>`;
       }
-      
+
       tablaHTML += '<table style="border-collapse: collapse; width: auto; max-width: 400px; font-family: Arial, sans-serif; margin: 0 auto;">';
-      
+
       filasDatos.forEach((fila) => {
         const esFilaTotal = fila.some(celda => celda.toLowerCase().includes('total'));
-        
+
         tablaHTML += '<tr>';
         fila.forEach((celda, celdaIndex) => {
           let estilo = 'padding: 6px 10px; border: 1px solid #000; font-size: 13px; ';
-          
+
           if (esFilaTotal) {
             estilo += 'background-color: #ffffff; font-weight: bold;';
           } else {
             estilo += 'background-color: #e8f0fe;';
           }
-          
+
           // Alineación de texto
           if (celdaIndex === fila.length - 1 && celda.includes('$')) {
             estilo += ' text-align: right;';
           } else {
             estilo += ' text-align: left;';
           }
-          
+
           tablaHTML += `<td style="${estilo}">${celda}</td>`;
         });
         tablaHTML += '</tr>';
       });
-      
+
       tablaHTML += '</table></div>';
       return tablaHTML;
     }
-    
+
     // Si no es tabla, devolver como está
     return data;
   };
@@ -582,7 +582,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
       alert("Por favor ingrese al menos un destinatario en el campo 'Para'");
       return;
     }
-    
+
     if (!validarListaEmails(para)) {
       alert("Por favor ingrese direcciones de correo válidas en el campo 'Para'");
       return;
@@ -614,7 +614,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
 
       // Preparar el mensaje completo con firma si está habilitada
       let mensajeCompleto = mensaje.trim();
-      
+
       // Agregar firma si está habilitada
       if (incluirFirma) {
         const firmaHTML = `
@@ -626,7 +626,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
   <div style="width: 72%; height: 1px; background-color: #06b6d4; margin: 8px 0;"></div>
   <div style="font-size:16px; font-weight:bold; color:#002d72; margin-top:-2px">TIGO</div>
 </div>`;
-        
+
         // Si el mensaje contiene HTML, agregar la firma como HTML
         if (mensaje.includes('<') && mensaje.includes('>')) {
           mensajeCompleto += firmaHTML;
@@ -651,7 +651,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
       // Debug: Mostrar el mensaje que se va a enviar
       console.log('📧 Mensaje completo a enviar:', mensajeCompleto);
       console.log('📧 ¿Contiene HTML?', mensajeCompleto.includes('<') && mensajeCompleto.includes('>'));
-      
+
       // Preparar FormData para enviar archivos
       const formData = new FormData();
       formData.append('para', para.trim());
@@ -687,7 +687,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
 
       if (resultado.success) {
         alert(`✅ Correo enviado exitosamente!\n\nID del mensaje: ${resultado.messageId}`);
-        
+
         // Limpiar formulario después del envío exitoso (opcional)
         // Comentado para evitar bloqueo del textarea
         // setPara('');
@@ -719,7 +719,13 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
       {/* Header del componente */}
       <div className="envio-header">
         <span className="envio-header-icon">📧</span>
-        <h2 className="envio-titulo">{titulo}</h2>
+        <div>
+          <h2 className="envio-titulo">{titulo}</h2>
+          <p className="envio-subtitulo">Gestión de comunicaciones oficiales y apertura de casos</p>
+        </div>
+        <button className="btn-preferencias">
+          ⚙️ Preferencias
+        </button>
       </div>
 
       {/* Contenido principal del formulario */}
@@ -727,41 +733,50 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
         <div className="envio-form">
           {/* Campo Para - Destinatarios principales */}
           <div className="envio-input-group">
-            <label className="envio-label">
-              <span className="envio-label-icon">👥</span> Para:
-            </label>
+            <div className="envio-field-header">
+              <label className="envio-label">
+                <span className="envio-label-icon">👥</span> Para:
+              </label>
+              <button className="btn-mini" onClick={() => copiarTexto(para)}>
+                📋 Copiar
+              </button>
+            </div>
             <textarea
               className={`envio-textarea ${obtenerClaseValidacion(para)}`}
               value={para}
               onChange={(e) => setPara(e.target.value)}
-              placeholder="Direcciones de correo para... (separadas por comas)"
+              placeholder="Escribe las direcciones de los destinatarios..."
             />
-            <button className="btn-mini" onClick={() => copiarTexto(para)}>
-              📋 Copiar Para
-            </button>
           </div>
 
           {/* Campo CC - Destinatarios en copia */}
           <div className="envio-input-group">
-            <label className="envio-label">
-              <span className="envio-label-icon">📨</span> CC:
-            </label>
+            <div className="envio-field-header">
+              <label className="envio-label">
+                <span className="envio-label-icon">📨</span> CC:
+              </label>
+              <button className="btn-mini" onClick={() => copiarTexto(cc)}>
+                📋 Copiar
+              </button>
+            </div>
             <textarea
               className={`envio-textarea ${obtenerClaseValidacion(cc)}`}
               value={cc}
               onChange={(e) => setCc(e.target.value)}
-              placeholder="Direcciones en copia... (separadas por comas)"
+              placeholder="Escribe las direcciones en copia..."
             />
-            <button className="btn-mini" onClick={() => copiarTexto(cc)}>
-              📋 Copiar CC
-            </button>
           </div>
 
           {/* Campo Asunto */}
           <div className="envio-input-group">
-            <label className="envio-label">
-              <span className="envio-label-icon">📝</span> Asunto:
-            </label>
+            <div className="envio-field-header">
+              <label className="envio-label">
+                <span className="envio-label-icon">📝</span> Asunto:
+              </label>
+              <button className="btn-mini" onClick={() => copiarTexto(asunto)}>
+                📋 Copiar
+              </button>
+            </div>
             <input
               className="envio-input"
               type="text"
@@ -769,35 +784,32 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
               onChange={(e) => setAsunto(e.target.value)}
               placeholder="Asunto del correo..."
             />
-            <button className="btn-mini" onClick={() => copiarTexto(asunto)}>
-              📋 Copiar Asunto
-            </button>
           </div>
 
           {/* Campo Mensaje con editor de texto enriquecido */}
           <div className="mensaje-container">
-            <label className="envio-label">
-              <span className="envio-label-icon">✍️</span> Mensaje:
-            </label>
+            <div className="envio-field-header">
+              <label className="envio-label">
+                <span className="envio-label-icon">✍️</span> Mensaje:
+              </label>
+              <button className="btn-mini" onClick={() => copiarTexto(mensaje)}>
+                📋 Copiar
+              </button>
+            </div>
             <div className="editor-wrapper">
               {!mostrarVistaPrevia ? (
-                // Editor de texto enriquecido
                 <RichTextEditor
                   content={mensaje}
                   onChange={setMensaje}
-                  placeholder="Cuerpo del mensaje... (Puedes pegar tablas de Excel con Ctrl+V o imágenes con Ctrl+V)"
+                  placeholder="Buen día, se anexa tabla con la apertura de despacho..."
                 />
               ) : (
-                // Vista previa del mensaje
-                <div 
+                <div
                   className="vista-previa-html"
                   dangerouslySetInnerHTML={{ __html: mensaje }}
                 />
               )}
             </div>
-            <button className="btn-mini" onClick={() => copiarTexto(mensaje)}>
-              📋 Copiar Mensaje
-            </button>
           </div>
 
           {/* Sección de Firma */}
@@ -848,20 +860,20 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
               style={{ display: 'none' }}
               accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
             />
-            <button 
+            <button
               className="btn-mini"
               onClick={() => document.getElementById('archivos-input')?.click()}
             >
               📎 Agregar Archivos
             </button>
-            
+
             {/* Lista de archivos adjuntos seleccionados */}
             {archivos.length > 0 && (
               <div className="lista-archivos">
                 {archivos.map(archivo => (
                   <div key={archivo.id} className="archivo-item">
                     <span className="archivo-nombre">{archivo.nombre}</span>
-                    <button 
+                    <button
                       className="btn-eliminar-archivo"
                       onClick={() => eliminarArchivo(archivo.id)}
                     >
@@ -910,7 +922,7 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
                   <strong>Mensaje:</strong>
                   <div className="vista-previa-mensaje">
                     {mensaje ? (
-                      <div 
+                      <div
                         dangerouslySetInnerHTML={{ __html: mensaje }}
                         className="mensaje-renderizado"
                       />
@@ -930,29 +942,44 @@ Solicitamos por favor gestionar permisos de ingreso para el siguiente personal, 
               </div>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Botones de acción principales */}
-      <div className="envio-botones">
-        <button className="btn btn-copiar" onClick={copiarTodo}>
-          📋 Copiar Todo
-        </button>
-        <button className="btn btn-guardar" onClick={guardarTodo}>
-          💾 Guardar
-        </button>
-        <button className="btn btn-limpiar" onClick={limpiarFormulario}>
-          🗑️ Limpiar
-        </button>
-        <button 
-          className="btn btn-vista-previa" 
-          onClick={() => setMostrarVistaPrevia(!mostrarVistaPrevia)}
-        >
-          👁️ Vista Previa
-        </button>
-        <button className="btn btn-enviar" onClick={enviarCorreo}>
-          📤 Enviar Correo
-        </button>
+          {/* Botones de acción — dentro del formulario, justo después de archivos */}
+          <div className="envio-botones">
+            <button className="btn btn-copiar" onClick={copiarTodo}>
+              📋 Copiar Todo
+            </button>
+            <button className="btn btn-guardar" onClick={guardarTodo}>
+              💾 Guardar
+            </button>
+            <button className="btn btn-limpiar" onClick={limpiarFormulario}>
+              🗑️ Limpiar
+            </button>
+            <button
+              className="btn btn-vista-previa"
+              onClick={() => setMostrarVistaPrevia(!mostrarVistaPrevia)}
+            >
+              👁️ Vista Previa
+            </button>
+            <button className="btn btn-enviar" onClick={enviarCorreo}>
+              ▷ ENVIAR CORREO
+            </button>
+          </div>
+
+        </div>{/* fin envio-form */}
+      </div>{/* fin envio-content */}
+
+      {/* Footer de estado del sistema */}
+      <div className="envio-footer">
+        <span className="envio-footer-copy">
+          © 2024 DISPATCH PRO DASHBOARD • PREMIUM MANAGEMENT INTERFACE
+        </span>
+        <div className="envio-footer-status">
+          <span className="envio-footer-online">
+            <span className="envio-footer-dot"></span>
+            SISTEMA OPERATIVO
+          </span>
+          <span className="envio-footer-sync">⏱ SYNC: 2 MIN AGO</span>
+        </div>
       </div>
     </div>
   );

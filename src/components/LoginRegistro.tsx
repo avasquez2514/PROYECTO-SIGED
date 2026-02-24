@@ -1,449 +1,277 @@
 "use client";
 
-import React, { useState, FormEvent } from "react";
-import { FaEye, FaEyeSlash, FaGoogle, FaApple } from "react-icons/fa";
+import React, { useState, FormEvent, useEffect, useRef } from "react";
+import { FaEye, FaEyeSlash, FaGoogle, FaApple, FaCheckCircle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
 import "../styles/loginregistro.css";
 
-/**
- * Props del componente LoginRegistro
- * @interface LoginRegistroProps
- * @property {(usuario: any) => void} onLogin - Función callback que se ejecuta al realizar login exitoso
- */
 interface LoginRegistroProps {
   onLogin: (usuario: any) => void;
 }
 
-/**
- * Componente de autenticación para login y registro de usuarios
- * Maneja login, registro y recuperación de contraseña
- * @component
- * @param {LoginRegistroProps} props - Props del componente
- * @returns {JSX.Element} Interfaz de autenticación completa
- */
 const LoginRegistro: React.FC<LoginRegistroProps> = ({ onLogin }) => {
-  // --- ESTADOS DEL COMPONENTE ---
-  
-  /**
-   * Estado que controla si se muestra el formulario de registro o login
-   * @state {boolean}
-   */
   const [esRegistro, setEsRegistro] = useState(false);
-  
-  /**
-   * Estado para el email del usuario
-   * @state {string}
-   */
   const [email, setEmail] = useState("");
-  
-  /**
-   * Estado para el nombre del usuario (solo en registro)
-   * @state {string}
-   */
   const [nombre, setNombre] = useState("");
-  
-  /**
-   * Estado para la contraseña del usuario
-   * @state {string}
-   */
   const [contraseña, setContraseña] = useState("");
-  
-  /**
-   * Estado que indica si se está procesando una petición
-   * @state {boolean}
-   */
   const [cargando, setCargando] = useState(false);
-  
-  /**
-   * Estado para mostrar/ocultar la contraseña en login/registro
-   * @state {boolean}
-   */
   const [mostrar, setMostrar] = useState(false);
-  
-  /**
-   * Estado para mostrar/ocultar la contraseña actual en recuperación
-   * @state {boolean}
-   */
-  const [mostrarActual, setMostrarActual] = useState(false);
-  
-  /**
-   * Estado para mostrar/ocultar la nueva contraseña en recuperación
-   * @state {boolean}
-   */
-  const [mostrarNueva, setMostrarNueva] = useState(false);
-  
-  /**
-   * Estado para mostrar/ocultar la confirmación de contraseña en recuperación
-   * @state {boolean}
-   */
-  const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
-  
-  /**
-   * Estado que controla si se muestra el formulario de recuperación de contraseña
-   * @state {boolean}
-   */
+  const [recordarme, setRecordarme] = useState(false);
+
+  // ── TOAST ──
+  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" | "info" } | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (msg: string, type: "success" | "error" | "info" = "info") => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ msg, type });
+    toastTimer.current = setTimeout(() => setToast(null), 3500);
+  };
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
+
+  // Modo recuperación
   const [modoRecuperar, setModoRecuperar] = useState(false);
-  
-  /**
-   * Estado para la contraseña actual en recuperación
-   * @state {string}
-   */
+  const [mostrarActual, setMostrarActual] = useState(false);
+  const [mostrarNueva, setMostrarNueva] = useState(false);
+  const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
   const [actual, setActual] = useState("");
-  
-  /**
-   * Estado para la nueva contraseña en recuperación
-   * @state {string}
-   */
   const [nueva, setNueva] = useState("");
-  
-  /**
-   * Estado para la confirmación de nueva contraseña en recuperación
-   * @state {string}
-   */
   const [confirmar, setConfirmar] = useState("");
 
-  // --- FUNCIONES DE UTILIDAD ---
-
-  /**
-   * Guarda la sesión del usuario en localStorage
-   * @param {string} token - Token JWT de autenticación
-   * @param {any} usuario - Datos del usuario autenticado
-   */
   const guardarSesionEnLocalStorage = (token: string, usuario: any) => {
     localStorage.setItem("token", token);
     localStorage.setItem("usuario", JSON.stringify(usuario));
   };
 
-  /**
-   * Maneja el envío del formulario de login o registro
-   * @async
-   * @param {FormEvent} e - Evento del formulario
-   * @returns {Promise<void>}
-   */
   const manejarEnvio = async (e: FormEvent) => {
     e.preventDefault();
-    
-    // Determinar ruta y datos según el modo (login o registro)
     const ruta = esRegistro ? "registro" : "login";
     const datos = esRegistro ? { email, nombre, contraseña } : { email, contraseña };
-
     try {
       setCargando(true);
-      
-      // Obtener URL base de la API desde variables de entorno o usar localhost por defecto
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-      
-      // Realizar petición a la API
       const respuesta = await fetch(`${API_BASE}/api/auth/${ruta}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(datos),
       });
-
       const resultado = await respuesta.json();
-
-      // Manejar errores de la API
-      if (!respuesta.ok) {
-        alert(resultado.mensaje || "Error en la autenticación");
-        return;
-      }
-
-      // Guardar sesión y notificar éxito
+      if (!respuesta.ok) { showToast(resultado.mensaje || "Error en la autenticación", "error"); return; }
       guardarSesionEnLocalStorage(resultado.token, resultado.usuario);
-      alert(resultado.mensaje);
-      onLogin(resultado.usuario);
-    } catch (error) {
-      alert("Error de conexión con el servidor");
-    } finally {
-      setCargando(false);
-    }
+      showToast(resultado.mensaje || "Inicio de sesión exitoso", "success");
+      setTimeout(() => onLogin(resultado.usuario), 1200);
+    } catch { showToast("Error de conexión con el servidor", "error"); } finally { setCargando(false); }
   };
 
-  /**
-   * Maneja la recuperación/cambio de contraseña
-   * @async
-   * @param {FormEvent} e - Evento del formulario
-   * @returns {Promise<void>}
-   */
   const recuperarContraseña = async (e: FormEvent) => {
     e.preventDefault();
-
-    // Validar que las contraseñas coincidan
-    if (nueva !== confirmar) {
-      alert("Las contraseñas no coinciden");
-      return;
-    }
-
+    if (nueva !== confirmar) { showToast("Las contraseñas no coinciden", "error"); return; }
     try {
-      // Obtener URL base de la API
       const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-      
-      // Realizar petición para cambiar contraseña
       const respuesta = await fetch(`${API_BASE}/api/auth/recuperar-contrasena`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, actual, nueva }),
       });
-
       const resultado = await respuesta.json();
-
-      // Manejar errores de la API
-      if (!respuesta.ok) {
-        alert(resultado.mensaje || "Error al recuperar contraseña");
-        return;
-      }
-
-      // Notificar éxito y limpiar formulario
-      alert(resultado.mensaje);
+      if (!respuesta.ok) { showToast(resultado.mensaje || "Error al recuperar contraseña", "error"); return; }
+      showToast(resultado.mensaje || "Contraseña actualizada correctamente", "success");
       setModoRecuperar(false);
-      setEmail("");
-      setActual("");
-      setNueva("");
-      setConfirmar("");
-    } catch (error) {
-      alert("Error de conexión con el servidor");
-    }
+      setEmail(""); setActual(""); setNueva(""); setConfirmar("");
+    } catch { showToast("Error de conexión con el servidor", "error"); }
   };
 
-  // --- RENDERIZADO DEL COMPONENTE ---
+  /* ─── MODO RECUPERAR ─── */
+  if (modoRecuperar) {
+    return (
+      <div className="lr-wrapper">
+        {/* ── TOAST ── */}
+        {toast && (
+          <div className={`lr-toast lr-toast-${toast.type}`}>
+            <span className="lr-toast-icon">
+              {toast.type === "success" && <FaCheckCircle />}
+              {toast.type === "error" && <FaTimesCircle />}
+              {toast.type === "info" && <FaInfoCircle />}
+            </span>
+            <span className="lr-toast-msg">{toast.msg}</span>
+            <div className="lr-toast-bar" />
+          </div>
+        )}
+        <div className="lr-card">
+          <h2 className="lr-title">Recuperar contraseña</h2>
+          <p className="lr-subtitle">Ingresa tu correo y establece una nueva contraseña.</p>
+          <form onSubmit={recuperarContraseña} className="lr-form">
+            <div className="lr-field">
+              <label className="lr-label">Correo electrónico</label>
+              <input type="email" className="lr-input" value={email} onChange={e => setEmail(e.target.value)} required placeholder=" " />
+            </div>
+            <div className="lr-field">
+              <label className="lr-label">Contraseña actual</label>
+              <div className="lr-pass-wrap">
+                <input type={mostrarActual ? "text" : "password"} className="lr-input" value={actual} onChange={e => setActual(e.target.value)} required placeholder=" " />
+                <button type="button" className="lr-eye" onClick={() => setMostrarActual(v => !v)}>{mostrarActual ? <FaEyeSlash /> : <FaEye />}</button>
+              </div>
+            </div>
+            <div className="lr-field">
+              <label className="lr-label">Nueva contraseña</label>
+              <div className="lr-pass-wrap">
+                <input type={mostrarNueva ? "text" : "password"} className="lr-input" value={nueva} onChange={e => setNueva(e.target.value)} required placeholder=" " />
+                <button type="button" className="lr-eye" onClick={() => setMostrarNueva(v => !v)}>{mostrarNueva ? <FaEyeSlash /> : <FaEye />}</button>
+              </div>
+            </div>
+            <div className="lr-field">
+              <label className="lr-label">Confirmar contraseña</label>
+              <div className="lr-pass-wrap">
+                <input type={mostrarConfirmar ? "text" : "password"} className="lr-input" value={confirmar} onChange={e => setConfirmar(e.target.value)} required placeholder=" " />
+                <button type="button" className="lr-eye" onClick={() => setMostrarConfirmar(v => !v)}>{mostrarConfirmar ? <FaEyeSlash /> : <FaEye />}</button>
+              </div>
+            </div>
+            <button type="submit" className="lr-btn-primary">Guardar nueva contraseña</button>
+            <button type="button" className="lr-btn-secondary" onClick={() => setModoRecuperar(false)}>Cancelar</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─── LOGIN / REGISTRO ─── */
   return (
-    <div className="login-wrapper">
-      <div className="login-card-wrapper">
-        {/* Logo de la aplicación */}
-        <img 
-          src="/icono01.png" 
-          alt="Logo" 
-          className="login-logo" 
-          style={{width: "60px", height: "60px", marginBottom: "1.5rem"}} 
-        />
-        
-        {/* Pestañas de navegación entre login y registro */}
-        <div className="login-tabs">
+    <div className="lr-wrapper">
+      {/* ── TOAST ── */}
+      {toast && (
+        <div className={`lr-toast lr-toast-${toast.type}`}>
+          <span className="lr-toast-icon">
+            {toast.type === "success" && <FaCheckCircle />}
+            {toast.type === "error" && <FaTimesCircle />}
+            {toast.type === "info" && <FaInfoCircle />}
+          </span>
+          <span className="lr-toast-msg">{toast.msg}</span>
+          <div className="lr-toast-bar" />
+        </div>
+      )}
+      <div className="lr-card">
+
+        {/* Título */}
+        <h2 className="lr-title">Bienvenido</h2>
+        <p className="lr-subtitle">Ingresa tus credenciales para continuar.</p>
+
+        {/* Tabs */}
+        <div className="lr-tabs">
           <button
-            className={`login-tab ${esRegistro ? "active" : ""}`}
+            className={`lr-tab${esRegistro ? " lr-tab-active" : ""}`}
             onClick={() => setEsRegistro(true)}
-            disabled={modoRecuperar}
           >
             Inscribirse
           </button>
           <button
-            className={`login-tab ${!esRegistro && !modoRecuperar ? "active" : ""}`}
+            className={`lr-tab${!esRegistro ? " lr-tab-active" : ""}`}
             onClick={() => setEsRegistro(false)}
-            disabled={modoRecuperar}
           >
-            Inciar sesión
+            Iniciar sesión
           </button>
         </div>
 
-        {/* Contenedor principal del formulario */}
-        <div className="login-card">
-          {modoRecuperar ? (
-            /* --- MODO RECUPERACIÓN DE CONTRASEÑA --- */
-            <>
-              <h2 className="login-title">Recuperar contraseña</h2>
-              <form onSubmit={recuperarContraseña} className="login-form">
-                {/* Campo de email */}
-                <div className="form-group">
-                  <input
-                    type="email"
-                    placeholder="Correo electrónico"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="login-input"
-                  />
-                </div>
+        <form onSubmit={manejarEnvio} className="lr-form">
 
-                {/* Campo de contraseña actual con toggle de visibilidad */}
-                <div className="form-group password-group">
-                  <input
-                    type={mostrarActual ? "text" : "password"}
-                    placeholder="Contraseña actual"
-                    value={actual}
-                    onChange={(e) => setActual(e.target.value)}
-                    required
-                    className="login-input"
-                  />
-                  <button
-                    type="button"
-                    className="eye-btn"
-                    onClick={() => setMostrarActual((v) => !v)}
-                  >
-                    {mostrarActual ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-
-                {/* Campo de nueva contraseña con toggle de visibilidad */}
-                <div className="form-group password-group">
-                  <input
-                    type={mostrarNueva ? "text" : "password"}
-                    placeholder="Nueva contraseña"
-                    value={nueva}
-                    onChange={(e) => setNueva(e.target.value)}
-                    required
-                    className="login-input"
-                  />
-                  <button
-                    type="button"
-                    className="eye-btn"
-                    onClick={() => setMostrarNueva((v) => !v)}
-                  >
-                    {mostrarNueva ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-
-                {/* Campo de confirmación de contraseña con toggle de visibilidad */}
-                <div className="form-group password-group">
-                  <input
-                    type={mostrarConfirmar ? "text" : "password"}
-                    placeholder="Confirmar nueva contraseña"
-                    value={confirmar}
-                    onChange={(e) => setConfirmar(e.target.value)}
-                    required
-                    className="login-input"
-                  />
-                  <button
-                    type="button"
-                    className="eye-btn"
-                    onClick={() => setMostrarConfirmar((v) => !v)}
-                  >
-                    {mostrarConfirmar ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-
-                {/* Botones de acción */}
-                <button type="submit" className="login-btn-primary">
-                  Guardar nueva contraseña
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setModoRecuperar(false)}
-                  className="login-btn-secondary"
-                >
-                  Cancelar
-                </button>
-              </form>
-            </>
-          ) : (
-            /* --- MODO LOGIN / REGISTRO --- */
-            <>
-              <h2 className="login-title">
-                {esRegistro ? "Crear una cuenta" : "Ingresa tu contraseña"}
-              </h2>
-
-              <form onSubmit={manejarEnvio} className="login-form">
-                {/* Campos de nombre y apellido (solo en registro) */}
-                {esRegistro && (
-                  <div className="form-row">
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        placeholder="Nombre"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                        required
-                        className="login-input"
-                        autoComplete="name"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        placeholder="Apellido"
-                        className="login-input"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Campo de email con icono */}
-                <div className="form-group">
-                  <div className="input-icon-wrapper">
-                    <svg
-                      className="input-icon"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                      <polyline points="22,6 12,13 2,6" />
-                    </svg>
-                    <input
-                      type="email"
-                      placeholder="Ingresa tu correo"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="login-input"
-                      autoComplete="username"
-                    />
-                  </div>
-                </div>
-
-                {/* Campo de contraseña con toggle de visibilidad */}
-                <div className="form-group password-group">
-                  <input
-                    type={mostrar ? "text" : "password"}
-                    placeholder="Contraseña"
-                    value={contraseña}
-                    onChange={(e) => setContraseña(e.target.value)}
-                    required
-                    className="login-input"
-                    autoComplete={esRegistro ? "new-password" : "current-password"}
-                  />
-                  <button
-                    type="button"
-                    className="eye-btn"
-                    onClick={() => setMostrar((v) => !v)}
-                  >
-                    {mostrar ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-
-                {/* Botón de envío principal */}
-                <button type="submit" className="login-btn-primary" disabled={cargando}>
-                  {cargando
-                    ? esRegistro
-                      ? "Registrando..."
-                      : "Ingresando..."
-                    : esRegistro
-                    ? "Crear cuenta"
-                    : "Ingresar"}
-                </button>
-              </form>
-
-              {/* Separador para login social */}
-              <div className="login-divider">
-                <span>O INICIA SESIÓN CON</span>
-              </div>
-
-              {/* Botones de login social */}
-              <div className="social-buttons">
-                <button className="social-btn google">
-                  <FaGoogle size={18} />
-                </button>
-                <button className="social-btn apple">
-                  <FaApple size={18} />
-                </button>
-              </div>
-
-              {/* Texto de términos y condiciones */}
-              <p className="login-footer-text">
-                Al crear una cuenta, aceptas nuestros Términos y Condiciones.
-              </p>
-            </>
+          {/* Nombre (solo registro) */}
+          {esRegistro && (
+            <div className="lr-field">
+              <label className="lr-label">Nombre completo</label>
+              <input
+                type="text"
+                className="lr-input"
+                value={nombre}
+                onChange={e => setNombre(e.target.value)}
+                required
+                placeholder=" "
+                autoComplete="name"
+              />
+            </div>
           )}
+
+          {/* Email */}
+          <div className="lr-field">
+            <label className="lr-label">Correo electrónico</label>
+            <input
+              type="email"
+              className="lr-input"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              placeholder=" "
+              autoComplete="username"
+            />
+          </div>
+
+          {/* Contraseña */}
+          <div className="lr-field">
+            <label className="lr-label">Contraseña</label>
+            <div className="lr-pass-wrap">
+              <input
+                type={mostrar ? "text" : "password"}
+                className="lr-input"
+                value={contraseña}
+                onChange={e => setContraseña(e.target.value)}
+                required
+                placeholder=" "
+                autoComplete={esRegistro ? "new-password" : "current-password"}
+              />
+              <button type="button" className="lr-eye" onClick={() => setMostrar(v => !v)}>
+                {mostrar ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+          </div>
+
+          {/* Recordarme + Olvidé contraseña */}
+          {!esRegistro && (
+            <div className="lr-row-extras">
+              <label className="lr-remember">
+                <input
+                  type="checkbox"
+                  className="lr-checkbox"
+                  checked={recordarme}
+                  onChange={e => setRecordarme(e.target.checked)}
+                />
+                <span>Recordarme</span>
+              </label>
+              <button type="button" className="lr-forgot" onClick={() => setModoRecuperar(true)}>
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+          )}
+
+          {/* Botón principal */}
+          <button type="submit" className="lr-btn-primary" disabled={cargando}>
+            {cargando
+              ? esRegistro ? "Registrando..." : "Ingresando..."
+              : esRegistro ? "CREAR CUENTA" : "INGRESAR"}
+          </button>
+        </form>
+
+        {/* Divisor */}
+        <div className="lr-divider">
+          <span>O INICIA SESIÓN CON</span>
         </div>
 
-        {/* Enlace para recuperar contraseña (solo visible en modo login/registro) */}
-        {!modoRecuperar && (
-          <button
-            type="button"
-            className="forgot-password-btn"
-            onClick={() => setModoRecuperar(true)}
-          >
-            ¿Olvidaste tu contraseña?
+        {/* Botones sociales */}
+        <div className="lr-social-grid">
+          <button className="lr-social-btn">
+            <FaGoogle size={16} style={{ color: "#ea4335" }} />
+            <span>Google</span>
           </button>
-        )}
+          <button className="lr-social-btn">
+            <FaApple size={16} />
+            <span>Apple</span>
+          </button>
+        </div>
+
+        {/* Footer */}
+        <p className="lr-footer">
+          Al crear una cuenta, aceptas nuestros{" "}
+          <span className="lr-link">Términos y Condiciones</span>{" "}
+          así como nuestra política de privacidad.
+        </p>
+
       </div>
     </div>
   );

@@ -119,31 +119,31 @@ const Trash2Icon = () => (
  */
 const NotasConciliacion: React.FC<NotasConciliacionProps> = ({ torre }) => {
   // --- ESTADOS DEL COMPONENTE ---
-  
+
   /**
    * Estado que controla la visibilidad del modal de edición
    * @state {boolean}
    */
   const [modalOpen, setModalOpen] = useState(false);
-  
+
   /**
    * Estado que indica el modo de operación actual
    * @state {Modo}
    */
   const [modo, setModo] = useState<Modo>("");
-  
+
   /**
    * Estado para el texto temporal en formularios y modal
    * @state {string}
    */
   const [textoTemporal, setTextoTemporal] = useState("");
-  
+
   /**
    * Estado que almacena el índice de la categoría en edición
    * @state {number | null}
    */
   const [indexEditar, setIndexEditar] = useState<number | null>(null);
-  
+
   /**
    * Estado que controla la visibilidad del formulario de nueva categoría
    * @state {boolean}
@@ -190,7 +190,7 @@ const NotasConciliacion: React.FC<NotasConciliacionProps> = ({ torre }) => {
   const agregarCategoria = () => {
     // Validar que el texto no esté vacío
     if (!textoTemporal.trim()) return;
-    
+
     // Agregar la nueva categoría y limpiar el formulario
     setCategorias([...categorias, textoTemporal.trim()]);
     setTextoTemporal("");
@@ -221,12 +221,13 @@ const NotasConciliacion: React.FC<NotasConciliacionProps> = ({ torre }) => {
 
   /**
    * Guarda los cambios del modal (modificación de categoría)
+   * Esta función ahora será pasada al prop 'onSave' del Modal
    * @function
    */
   const guardarModal = () => {
     // Validar que el texto no esté vacío
     if (!textoTemporal.trim()) return;
-    
+
     // Actualizar la categoría en la posición específica
     if (modo === "modificar" && indexEditar !== null) {
       const nuevas = [...categorias];
@@ -254,7 +255,7 @@ const NotasConciliacion: React.FC<NotasConciliacionProps> = ({ torre }) => {
   const eliminarCategoria = (index: number) => {
     const confirmado = window.confirm("¿Estás seguro de eliminar esta categoría?");
     if (!confirmado) return;
-    
+
     // Filtrar la categoría a eliminar
     const nuevas = categorias.filter((_, i) => i !== index);
     setCategorias(nuevas);
@@ -268,117 +269,91 @@ const NotasConciliacion: React.FC<NotasConciliacionProps> = ({ torre }) => {
   const onDragEnd = (result: DropResult) => {
     // Validar que haya un destino válido
     if (!result.destination) return;
-    
+
     // Obtener índices de origen y destino
     const items = Array.from(categorias);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-    
+
     // Actualizar el estado con el nuevo orden
     setCategorias(items);
   };
 
   // --- RENDERIZADO DEL COMPONENTE ---
   return (
-    <div className="notas-conciliacion-container">
-      <div className="notas-conciliacion-content">
-        {/* Header del componente */}
-        <div className="notas-conciliacion-header">
-          <div className="notas-conciliacion-title-section">
-            {/* Icono principal */}
-            <div className="notas-conciliacion-icon">
-              <FileTextIcon />
+    <div className="notas-conciliacion-view">
+      <div className="notas-conciliacion-container-p">
+        {/* Header Principal */}
+        <div className="notas-header-p">
+          <div className="header-info-p">
+            <div className="header-icon-box-p">
+              <span className="material-symbols-outlined">description</span>
             </div>
-            {/* Título y descripción */}
-            <div className="notas-conciliacion-title-text">
-              <h1>Notas de Conciliación</h1>
-              <p>Gestiona las categorías de conciliación</p>
+            <div className="header-text-p">
+              <h1 className="title-p">Notas de Conciliación</h1>
+              <p className="subtitle-p">Gestiona las categorías de conciliación</p>
             </div>
           </div>
-          
-          {/* Botón para agregar nueva categoría */}
-          <button className="agregar-button" onClick={abrirFormularioAgregar}>
-            <PlusIcon />
+          <button className="add-btn-p" onClick={abrirFormularioAgregar}>
+            <span className="material-symbols-outlined">add</span>
             Agregar Categoría
           </button>
         </div>
 
-        {/* Formulario inline para nueva categoría */}
+        {/* Formulario Inline */}
         {mostrarFormulario && (
-          <div className="categoria-formulario">
+          <div className="categoria-form-p">
             <input
               type="text"
               value={textoTemporal}
               onChange={(e) => setTextoTemporal(e.target.value)}
               placeholder="Nombre de la categoría..."
+              className="form-input-p"
             />
-            <div className="categoria-formulario-botones">
-              <button onClick={agregarCategoria} className="btn-guardar">
-                Guardar Categoría
-              </button>
+            <div className="form-actions-p">
+              <button onClick={agregarCategoria} className="btn-save-p">GUARDAR</button>
               <button
                 onClick={() => {
                   setMostrarFormulario(false);
                   setTextoTemporal('');
                 }}
-                className="btn-cancelar"
+                className="btn-cancel-p"
               >
-                Cancelar
+                CANCELAR
               </button>
             </div>
           </div>
         )}
 
-        {/* Grid de categorías con funcionalidad de drag & drop */}
+        {/* Grid de Categorías */}
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="categorias-list">
+          <Droppable droppableId="categorias-grid-p">
             {(provided) => (
               <div
-                className="categorias-grid"
+                className="categorias-grid-p"
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
                 {categorias.map((categoria, index) => (
                   <Draggable key={categoria} draggableId={categoria} index={index}>
-                    {(provided, snapshot) => (
+                    {(provided) => (
                       <div
-                        className={`categoria-item ${snapshot.isDragging ? 'dragging' : ''}`}
+                        className="categoria-card-p"
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                       >
-                        {/* Header de la categoría con nombre */}
-                        <div className="categoria-header">
-                          <h3 className="categoria-nombre">{categoria}</h3>
-                        </div>
-                        
-                        {/* Botones de acción para cada categoría */}
-                        <div className="categoria-botones">
-                          {/* Botón editar */}
-                          <button
-                            onClick={() => abrirModalModificar(index)}
-                            className="edit"
-                            title="Editar"
-                          >
-                            <Edit2Icon />
+                        <h3 className="card-title-p">{categoria}</h3>
+
+                        <div className="card-actions-p">
+                          <button onClick={() => abrirModalModificar(index)} title="Modificar">
+                            <span className="material-symbols-outlined">edit</span>
                           </button>
-                          
-                          {/* Botón copiar */}
-                          <button
-                            onClick={() => copiarTexto(categoria)}
-                            className="copy"
-                            title="Copiar"
-                          >
-                            <CopyIcon />
+                          <button onClick={() => copiarTexto(categoria)} title="Copiar">
+                            <span className="material-symbols-outlined">content_copy</span>
                           </button>
-                          
-                          {/* Botón eliminar */}
-                          <button
-                            onClick={() => eliminarCategoria(index)}
-                            className="delete"
-                            title="Eliminar"
-                          >
-                            <Trash2Icon />
+                          <button onClick={() => eliminarCategoria(index)} className="delete" title="Eliminar">
+                            <span className="material-symbols-outlined">delete</span>
                           </button>
                         </div>
                       </div>
@@ -391,36 +366,42 @@ const NotasConciliacion: React.FC<NotasConciliacionProps> = ({ torre }) => {
           </Droppable>
         </DragDropContext>
 
-        {/* Estado vacío cuando no hay categorías */}
+        {/* Estado Vacío */}
         {categorias.length === 0 && (
-          <div className="empty-state">
-            <FileTextIcon />
-            <p>No hay categorías disponibles</p>
-            <p>Haz clic en "Agregar Categoría" para crear una nueva</p>
+          <div className="empty-state-p">
+            <span className="material-symbols-outlined">inventory_2</span>
+            <p>No se encontraron categorías registradas</p>
           </div>
         )}
 
-        {/* Footer con contador de categorías */}
-        <div className="categorias-footer">
-          <p>
-            Total de categorías: <span>{categorias.length}</span>
-          </p>
-        </div>
+        {/* Footer con Contador Pill */}
+        {categorias.length > 0 && (
+          <div className="notas-footer-p">
+            <div className="pill-counter-p">
+              Total de categorías: <span className="count-p">{categorias.length}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal para editar categorías */}
-      <Modal isOpen={modalOpen} onClose={cerrarModal}>
-        <h2>Modificar Categoría</h2>
-        <input
-          type="text"
-          value={textoTemporal}
-          onChange={(e) => setTextoTemporal(e.target.value)}
-          placeholder="Escribe la categoría"
-          style={{ width: "100%", marginBottom: "10px" }}
-        />
-        <button onClick={guardarModal} className="modal-save-button">
-          Actualizar
-        </button>
+      <Modal
+        isOpen={modalOpen}
+        onClose={cerrarModal}
+        onSave={guardarModal}
+        showSaveButton={true}
+        title={"Modificar Categoría"}
+      >
+        <div className="modal-body-p">
+          <p className="modal-label-p">Nuevo nombre de la categoría</p>
+          <input
+            type="text"
+            className="modal-input-p"
+            value={textoTemporal}
+            onChange={(e) => setTextoTemporal(e.target.value)}
+            placeholder="Escribe la categoría"
+          />
+        </div>
       </Modal>
     </div>
   );

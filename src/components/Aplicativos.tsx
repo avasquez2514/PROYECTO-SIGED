@@ -70,15 +70,19 @@ const API = `http://localhost:4000/api/aplicativos`;
  * @component
  * @returns {JSX.Element} Interfaz completa de gestión de aplicativos
  */
-const Aplicativos: React.FC = () => {
+interface AplicativosProps {
+  torre?: string;
+}
+
+const Aplicativos: React.FC<AplicativosProps> = ({ torre }) => {
   // --- ESTADO ---
-  
+
   /**
    * Estado que almacena la lista completa de aplicativos del usuario
    * @state {Aplicativo[]}
    */
   const [aplicativos, setAplicativos] = useState<Aplicativo[]>([]);
-  
+
   /**
    * Estado para el formulario de nuevo aplicativo o edición
    * @state {NuevoAplicativo}
@@ -88,19 +92,19 @@ const Aplicativos: React.FC = () => {
     url: "",
     categoria: "",
   });
-  
+
   /**
    * Estado que almacena las categorías disponibles del usuario
    * @state {string[]}
    */
   const [categoriasDisponibles, setCategoriasDisponibles] = useState<string[]>([]);
-  
+
   /**
    * Estado para el nombre de nueva categoría en el modal
    * @state {string}
    */
   const [otraCategoria, setOtraCategoria] = useState("");
-  
+
   /**
    * Estado que controla la categoría actualmente seleccionada en la sidebar
    * @state {string}
@@ -112,19 +116,19 @@ const Aplicativos: React.FC = () => {
    * @state {boolean}
    */
   const [modalOpen, setModalOpen] = useState(false);
-  
+
   /**
    * Estado que indica si se está editando un aplicativo existente
    * @state {boolean}
    */
   const [editando, setEditando] = useState(false);
-  
+
   /**
    * Estado que almacena el ID del aplicativo en edición
    * @state {number | null}
    */
   const [editandoId, setEditandoId] = useState<number | null>(null);
-  
+
   /**
    * Estado que controla el tipo de modal activo (aplicativo o categoría)
    * @state {"aplicativo" | "categoria"}
@@ -173,7 +177,7 @@ const Aplicativos: React.FC = () => {
   const fetchAplicativos = async () => {
     const token = getToken();
     const usuario = getUsuario();
-    
+
     // Validar que existe autenticación
     if (!token || !usuario?.id) return;
 
@@ -189,7 +193,7 @@ const Aplicativos: React.FC = () => {
       // Extraer categorías únicas de los aplicativos
       const categorias = [...new Set(data.map((a) => a.categoria))];
       setCategoriasDisponibles(categorias);
-      
+
       // Seleccionar primera categoría por defecto si no hay selección
       if (!categoriaSeleccionada && categorias.length > 0) {
         setCategoriaSeleccionada(categorias[0]);
@@ -207,7 +211,7 @@ const Aplicativos: React.FC = () => {
   const agregarAplicativo = async () => {
     const token = getToken();
     const usuario = getUsuario();
-    
+
     // Validaciones de autenticación y datos requeridos
     if (!token || !usuario?.id) return;
     if (!nuevo.nombre || !nuevo.url || !nuevo.categoria)
@@ -239,7 +243,7 @@ const Aplicativos: React.FC = () => {
   const guardarEdicion = async () => {
     const token = getToken();
     const usuario = getUsuario();
-    
+
     // Validar que hay un aplicativo en edición
     if (!token || !usuario?.id || !editandoId) return;
 
@@ -270,7 +274,7 @@ const Aplicativos: React.FC = () => {
   const eliminarAplicativo = async (id: number) => {
     const token = getToken();
     if (!token) return;
-    
+
     // Confirmación de eliminación
     if (!window.confirm("¿Eliminar este aplicativo?")) return;
 
@@ -307,12 +311,12 @@ const Aplicativos: React.FC = () => {
     // Confirmación de eliminación
     if (!window.confirm(`¿Eliminar la categoría "${cat}" y todos sus aplicativos?`))
       return;
-    
+
     // Filtrar aplicativos y categorías
     setAplicativos(aplicativos.filter((a) => a.categoria !== cat));
     const nuevas = categoriasDisponibles.filter((c) => c !== cat);
     setCategoriasDisponibles(nuevas);
-    
+
     // Ajustar categoría seleccionada si era la eliminada
     if (categoriaSeleccionada === cat) {
       setCategoriaSeleccionada(nuevas[0] || "");
@@ -337,10 +341,10 @@ const Aplicativos: React.FC = () => {
    * Abre el modal para agregar un nuevo aplicativo
    */
   const abrirModalAplicativo = () => {
-    setNuevo({ 
-      nombre: "", 
-      url: "", 
-      categoria: categoriaSeleccionada || "" 
+    setNuevo({
+      nombre: "",
+      url: "",
+      categoria: categoriaSeleccionada || ""
     });
     setEditando(false);
     setEditandoId(null);
@@ -415,160 +419,168 @@ const Aplicativos: React.FC = () => {
     a.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
   );
 
-  // --- RENDER ---
   return (
-    <div className="app-layout">
-      {/* --- BARRA LATERAL --- */}
-      <aside className="app-sidebar">
-        <h3 className="sidebar-title">CATEGORIAS</h3>
-        <nav className="sidebar-nav">
-          {categoriasDisponibles.map((cat) => (
-            <button
-              key={cat}
-              className={`sidebar-btn ${
-                cat === categoriaSeleccionada ? "active" : ""
-              }`}
-              onClick={() => setCategoriaSeleccionada(cat)}
-            >
-              <span>{cat}</span>
-              <span className="sidebar-btn-count">
-                {agrupados[cat]?.length || 0}
-              </span>
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-buttons">
-          <button className="btn-add-category" onClick={abrirModalCategoria}>
-            <FaPlus style={{ marginRight: "0.5rem" }} />
-            Agregar Categoría
-          </button>
-          <button className="btn-add-app-sidebar" onClick={abrirModalAplicativo}>
-            <FaPlus style={{ marginRight: "0.5rem" }} />
-            Agregar Aplicativo
-          </button>
-        </div>
-      </aside>
+    <div className="aplicativos-wrapper">
+      <header className="header">
+        <div className="header-title">Workspace / Dashboard</div>
 
-      {/* --- CONTENIDO PRINCIPAL --- */}
-      <main className="app-main-content">
-        <header className="content-header">
-          <h1 className="content-title">{categoriaSeleccionada}</h1>
-          <div className="search-bar">
-            <FaSearch className="search-icon" />
+        <div className="header-actions">
+          <div className="search-box">
+            <span className="material-symbols-outlined icon">search</span>
             <input
               type="text"
-              className="search-input"
               placeholder="Buscar aplicativo..."
               value={filtroNombre}
               onChange={(e) => setFiltroNombre(e.target.value)}
             />
           </div>
-        </header>
 
-        {/* --- CONTENEDOR DE LA TABLA --- */}
-        <div className="table-container">
-          <h3 className="table-title">Lista de aplicativos</h3>
-          <table className="app-table">
-            <thead>
-              <tr>
-                <th>
-                  <input type="checkbox" />
-                </th>
-                <th>Icono</th>
-                <th>Nombre</th>
-                <th>URL</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
+          <div className="user-status">
+            <div className="status-dot"></div>
+            <span className="status-text">TORRE: {torre?.toUpperCase() || "COSTA"}</span>
+          </div>
 
-            <tbody>
-              {aplicativosFiltrados.map((a) => (
-                <tr key={a.id}>
-                  <td>
-                    <input type="checkbox" />
-                  </td>
-                  <td>
-                    {/* Icono del aplicativo desde favicon */}
-                    <img
-                      src={`${new URL(a.url).origin}/favicon.ico`}
-                      alt={`Logo de ${a.nombre}`}
-                      className="app-logo"
-                      onError={(e) => {
-                        // Fallback a icono por defecto si favicon no existe
-                        (e.target as HTMLImageElement).src = "/icono-app.png";
-                      }}
-                    />
-                  </td>
-                  <td>{a.nombre}</td>
-                  <td className="url-cell">
-                    <a href={a.url} target="_blank" rel="noreferrer" title={a.url}>
-                      {a.url}
-                    </a>
-                  </td>
-                  <td>
-                    <div className="actions-cell">
-                      {/* Botón editar */}
-                      <button
-                        className="btn-icon edit"
-                        title="Editar"
-                        onClick={() => abrirEditar(a)}
-                      >
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                      </button>
-                      {/* Botón eliminar */}
-                      <button
-                        className="btn-icon delete"
-                        title="Eliminar"
-                        onClick={() => eliminarAplicativo(a.id)}
-                      >
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M3 6h18"></path>
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {/* Mensaje cuando no hay resultados */}
-          {aplicativosFiltrados.length === 0 && (
-            <p className="empty-table-message">
-              No se encontraron aplicativos
-              {filtroNombre && ` que coincidan con "${filtroNombre}"`}.
-            </p>
-          )}
+          <div className="user-profile-btn" style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#1e293b", border: "1px solid #334155", overflow: "hidden" }}>
+            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="User" />
+          </div>
         </div>
-      </main>
+      </header>
+
+      <div className="dashboard-content">
+        <div className="dashboard-container">
+          <div className="page-header">
+            <div className="page-title">
+              <h2>
+                APLICATIVOS DESPACHO
+                <span className="badge">{aplicativos.length} TOTAL</span>
+              </h2>
+              <p className="page-subtitle">Gestión centralizada de herramientas operativas de despacho.</p>
+            </div>
+            <button className="btn-new" onClick={abrirModalAplicativo}>
+              <span className="material-symbols-outlined">add</span>
+              Nuevo Aplicativo
+            </button>
+          </div>
+
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th style={{ width: "60px", textAlign: "center" }}>
+                    <div className="checkbox-circle" style={{ opacity: 0.5 }}></div>
+                  </th>
+                  <th>ÍCONO</th>
+                  <th>NOMBRE DEL APLICATIVO</th>
+                  <th>URL DE ACCESO</th>
+                  <th style={{ textAlign: "right" }}>ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                {aplicativosFiltrados.map((a) => {
+                  const getAppData = (name: string) => {
+                    const lower = name.toLowerCase();
+                    if (lower.includes('bmc')) return { icon: 'bolt', color: '#f97316', tag: 'PLATFORM · V2.4' };
+                    if (lower.includes('pymes')) return { icon: 'grid_view', color: '#3b82f6', tag: 'INTERNAL TOOL' };
+                    if (lower.includes('gmail')) return { icon: 'chat', color: '#ef4444', tag: 'COMMUNICATION' };
+                    if (lower.includes('parafiscales')) return { icon: 'folder', color: '#10b981', tag: 'DOCUMENTATION · DRIVE' };
+                    if (lower.includes('buzon')) return { icon: 'mail', color: '#a855f7', tag: 'OUTLOOK MAIL' };
+                    return { icon: 'apps', color: '#6366f1', tag: 'EXTERNAL RESOURCE' };
+                  };
+
+                  const appData = getAppData(a.nombre);
+
+                  return (
+                    <tr key={a.id}>
+                      <td style={{ textAlign: "center" }}>
+                        <div className="checkbox-circle"></div>
+                      </td>
+                      <td>
+                        <div
+                          className="icon-box"
+                          style={{
+                            background: `${appData.color}15`,
+                            borderColor: `${appData.color}30`
+                          }}
+                        >
+                          <span className="material-symbols-outlined" style={{ color: appData.color, fontSize: '1.5rem' }}>
+                            {appData.icon}
+                          </span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="app-name">{a.nombre.toUpperCase()}</div>
+                        <div className="app-tag">{appData.tag}</div>
+                      </td>
+                      <td>
+                        <a href={a.url} target="_blank" rel="noopener noreferrer" className="app-link">
+                          {a.url.length > 45 ? a.url.substring(0, 45) + "..." : a.url}
+                          <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>open_in_new</span>
+                        </a>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button className="btn-action" onClick={() => abrirEditar(a)}>
+                            <span className="material-symbols-outlined">edit</span>
+                          </button>
+                          <button className="btn-action delete" onClick={() => eliminarAplicativo(a.id)}>
+                            <span className="material-symbols-outlined">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            <div className="table-footer">
+              <span className="footer-text">
+                MOSTRANDO 1 - {aplicativosFiltrados.length} DE {aplicativos.length} APLICATIVOS
+              </span>
+              <div className="pagination">
+                <button className="page-btn"><span className="material-symbols-outlined">chevron_left</span></button>
+                <button className="page-btn active">1</button>
+                <button className="page-btn">2</button>
+                <button className="page-btn">3</button>
+                <button className="page-btn"><span className="material-symbols-outlined">chevron_right</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-label">TOTAL APPS</div>
+              <div className="stat-value">{aplicativos.length}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">LINKS ACTIVOS</div>
+              <div className="stat-value" style={{ color: "#10b981" }}>{aplicativos.length - 2 > 0 ? aplicativos.length - 2 : aplicativos.length}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">MANTENIMIENTO</div>
+              <div className="stat-value" style={{ color: "#f97316" }}>2</div>
+            </div>
+            <div className="stat-card" style={{ border: "1px solid rgba(59, 130, 246, 0.3)", background: "rgba(59, 130, 246, 0.05)" }}>
+              <div className="stat-label">VERSIÓN SISTEMA</div>
+              <div className="stat-value" style={{ color: "var(--primary)" }}>v4.0.1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button className="help-fab">
+        <span className="material-symbols-outlined" style={{ fontSize: "1.875rem" }}>help_outline</span>
+      </button>
+
+      <div className="bg-decoration">
+        <svg width="128" height="128" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2L2 22h20L12 2zm0 3.84L18.66 20H5.34L12 5.84zM11 11h2v4h-2v-4zm0 6h2v2h-2v-2z"></path>
+        </svg>
+      </div>
 
       {/* --- MODAL APLICATIVO --- */}
-      <Modal 
-        isOpen={modalOpen && modoModal === "aplicativo"} 
+      <Modal
+        isOpen={modalOpen && modoModal === "aplicativo"}
         onClose={resetFormulario}
         onSave={handleGuardar}
         title={editando ? "Editar Aplicativo" : "Agregar Aplicativo"}
@@ -625,8 +637,8 @@ const Aplicativos: React.FC = () => {
       </Modal>
 
       {/* --- MODAL CATEGORÍA --- */}
-      <Modal 
-        isOpen={modalOpen && modoModal === "categoria"} 
+      <Modal
+        isOpen={modalOpen && modoModal === "categoria"}
         onClose={resetFormulario}
         onSave={handleGuardar}
         title="Nueva Categoría"

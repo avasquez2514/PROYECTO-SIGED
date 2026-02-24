@@ -39,31 +39,31 @@ interface PlantillaSelectorProps {
  */
 const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }) => {
   // --- ESTADOS DEL COMPONENTE ---
-  
+
   /**
    * Estado que almacena las plantillas organizadas por nombre de novedad
    * @state {Record<string, Plantilla>}
    */
   const [plantillas, setPlantillas] = useState<Record<string, Plantilla>>({});
-  
+
   /**
    * Estado para la novedad actualmente seleccionada
    * @state {string}
    */
   const [notaSeleccionada, setNotaSeleccionada] = useState("");
-  
+
   /**
    * Estado que controla el tipo de nota a mostrar (pública o interna)
    * @state {"publica" | "interna"}
    */
   const [tipoNota, setTipoNota] = useState<"publica" | "interna">("interna");
-  
+
   /**
    * Estado para el texto de la nota actual
    * @state {string}
    */
   const [textoNota, setTextoNota] = useState("");
-  
+
   /**
    * Estado que indica si el texto ha sido modificado manualmente
    * @state {boolean}
@@ -75,7 +75,7 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
    * @state {boolean}
    */
   const [mostrarModal, setMostrarModal] = useState(false);
-  
+
   /**
    * Estado que indica el modo de operación del modal
    * @state {"agregar" | "modificar"}
@@ -109,7 +109,7 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
     const token = localStorage.getItem("token");
     const usuarioRaw = localStorage.getItem("usuario");
     const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
-    
+
     // Validar que exista autenticación
     if (!token || !usuario?.id) return;
 
@@ -144,11 +144,11 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
       data.forEach((row: any) => {
         // Excluir plantillas adicionales y notas de avances
         const esPlantillaAdicional = row.plantilla?.trim();
-        const esNotaAvances = row.nota_avances?.trim() && 
-                             !row.nota_publica?.trim() && 
-                             !row.nota_interna?.trim() && 
-                             !row.plantilla?.trim();
-        
+        const esNotaAvances = row.nota_avances?.trim() &&
+          !row.nota_publica?.trim() &&
+          !row.nota_interna?.trim() &&
+          !row.plantilla?.trim();
+
         // Incluir solo notas públicas/internas regulares
         if (!esPlantillaAdicional && !esNotaAvances) {
           const novedad = row.novedad || "Sin título";
@@ -230,7 +230,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
    */
   const copiarTexto = () => {
     navigator.clipboard.writeText(textoNota);
-    alert("Texto copiado al portapapeles");
   };
 
   /**
@@ -285,17 +284,17 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
     const token = localStorage.getItem("token");
     const usuarioRaw = localStorage.getItem("usuario");
     const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
-    
+
     // Validar autenticación
     if (!token || !usuario?.id) return;
 
     try {
       let response;
-      
+
       if (modoModal === "agregar") {
         // Crear nombre único para evitar duplicados
         const nombreUnico = `${formData.novedad.trim()} - ${Date.now()}`;
-        
+
         // Realizar petición POST para crear nueva plantilla
         response = await fetch(`${API}`, {
           method: "POST",
@@ -313,7 +312,7 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
       } else {
         // Modo modificar - obtener datos actuales
         const actual = plantillas[notaSeleccionada];
-        
+
         // Realizar petición PUT para actualizar plantilla existente
         response = await fetch(`${API}/plantilla/${actual.plantilla_id}`, {
           method: "PUT",
@@ -342,7 +341,7 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
           window.location.href = "/login";
           return;
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.mensaje || `Error ${response.status}: ${response.statusText}`);
       }
@@ -369,7 +368,7 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
       alert("Selecciona una nota primero");
       return;
     }
-    
+
     const id = plantillas[notaSeleccionada].id;
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -392,7 +391,7 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
           window.location.href = "/login";
           return;
         }
-        
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.mensaje || `Error ${response.status}: ${response.statusText}`);
       }
@@ -411,177 +410,154 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
 
   // --- RENDERIZADO DEL COMPONENTE ---
   return (
-    <div className="plantilla-container">
-      <div className="plantilla-card">
-        {/* Header con icono, título y subtítulo */}
-        <div className="plantilla-header">
-          <span className="plantilla-header-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-          </span>
-          <div className="plantilla-header-text">
-            <h2 className="plantilla-title">Selecciona Nota</h2>
-            <p className="plantilla-subtitle">Gestiona y personaliza tus notas</p>
+    <div className="plantilla-view-wrapper">
+      <div className="plantilla-container-premium">
+        <div className="plantilla-card-premium">
+          {/* Header con icono, título y subtítulo */}
+          <div className="plantilla-header-premium">
+            <div className="header-icon-box-p">
+              <span className="material-symbols-outlined">description</span>
+            </div>
+            <div className="header-text-p">
+              <h2 className="title-p">Plantillas de Notas</h2>
+              <p className="subtitle-p">Gestión de comunicaciones y notas de despacho</p>
+            </div>
+          </div>
+
+          {/* Dropdown para seleccionar nota */}
+          <div className="category-section-p">
+            <label className="label-p">• SELECCIONAR CATEGORÍA</label>
+            <div className="select-wrapper-p">
+              <select value={notaSeleccionada} onChange={handleNotaChange} className="select-p">
+                <option value="">ELIJA UNA OPCIÓN</option>
+                {Object.keys(plantillas).map((key) => (
+                  <option key={key} value={key}>
+                    {key.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <span className="material-symbols-outlined select-icon-p">waves</span>
+            </div>
+          </div>
+
+          {/* Botones de Acción Superior */}
+          <div className="actions-grid-p">
+            <button className="action-btn-p" onClick={abrirModalAgregar}>
+              <span className="material-symbols-outlined">add</span>
+              AGREGAR
+            </button>
+            <button className="action-btn-p" onClick={abrirModalModificar}>
+              <span className="material-symbols-outlined">edit_note</span>
+              MODIFICAR
+            </button>
+            <button className="action-btn-p" onClick={eliminarPlantilla}>
+              <span className="material-symbols-outlined">delete_sweep</span>
+              ELIMINAR
+            </button>
+          </div>
+
+          {/* Textarea para edición de notas */}
+          <div className="textarea-section-p">
+            <textarea
+              value={textoNota}
+              onChange={handleTextoChange}
+              className="textarea-p"
+              placeholder="Contenido de la plantilla..."
+            />
+          </div>
+
+          {/* Seleccionador de Tipo de Nota */}
+          <div className="type-toggle-p">
+            <button
+              className={`type-toggle-btn ${tipoNota === "interna" ? "active" : ""}`}
+              onClick={() => handleTipoNotaChange("interna")}
+            >
+              <span className="material-symbols-outlined">lock</span>
+              NOTA INTERNA
+            </button>
+            <button
+              className={`type-toggle-btn ${tipoNota === "publica" ? "active" : ""}`}
+              onClick={() => handleTipoNotaChange("publica")}
+            >
+              <span className="material-symbols-outlined">public</span>
+              NOTA PÚBLICA
+            </button>
+          </div>
+
+          {/* Botones de utilidad */}
+          <div className="utility-grid-p">
+            <button className="util-btn-p copy" onClick={copiarTexto}>
+              <span className="material-symbols-outlined">content_copy</span>
+              COPIAR TEXTO
+            </button>
+            <button className="util-btn-p clear" onClick={limpiarTexto}>
+              <span className="material-symbols-outlined">backspace</span>
+              LIMPIAR
+            </button>
           </div>
         </div>
-
-        {/* Label Categoría */}
-        <div className="plantilla-categoria-label">
-          <span className="categoria-bullet">•</span> Categoría
-        </div>
-
-        {/* Dropdown para seleccionar nota */}
-        <select value={notaSeleccionada} onChange={handleNotaChange} className="plantilla-select">
-          <option value="">-- Selecciona una nota --</option>
-          {Object.keys(plantillas).map((key) => (
-            <option key={key} value={key}>
-              {key}
-            </option>
-          ))}
-        </select>
-
-        {/* Botones de Acción Superior (Agregar, Modificar, Eliminar) */}
-        <div className="plantilla-buttons-top">
-          {/* Botón Agregar */}
-          <button className="plantilla-button agregar" onClick={abrirModalAgregar}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Agregar
-          </button>
-          {/* Botón Modificar */}
-          <button className="plantilla-button modificar" onClick={abrirModalModificar}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            Modificar
-          </button>
-          {/* Botón Eliminar */}
-          <button className="plantilla-button eliminar" onClick={eliminarPlantilla}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-            Eliminar
-          </button>
-        </div>
-
-        {/* Textarea para edición de notas - SIEMPRE VISIBLE */}
-        <textarea
-          rows={6}
-          value={textoNota}
-          onChange={handleTextoChange}
-          className="plantilla-textarea"
-          placeholder="Escribe tu nota aquí..."
-        />
-
-        {/* Botones para seleccionar tipo de nota */}
-        <div className="plantilla-buttons">
-          {/* Botón Nota Interna */}
-          <button
-            className={`plantilla-button interna ${tipoNota === "interna" ? "active" : ""}`}
-            onClick={() => handleTipoNotaChange("interna")}
-          >
-            Nota Interna
-          </button>
-          {/* Botón Nota Pública */}
-          <button
-            className={`plantilla-button publica ${tipoNota === "publica" ? "active" : ""}`}
-            onClick={() => handleTipoNotaChange("publica")}
-          >
-            Nota Pública
-          </button>
-        </div>
-
-        {/* Botones de utilidad (Copiar y Limpiar) */}
-        <div className="plantilla-buttons">
-          {/* Botón Copiar */}
-          <button className="plantilla-button copy" onClick={copiarTexto}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-            </svg>
-            Copiar
-          </button>
-          {/* Botón Limpiar */}
-          <button className="plantilla-button clear" onClick={limpiarTexto}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/>
-            </svg>
-            Limpiar
-          </button>
-        </div>
-
-        {/* Footer: Indicador del tipo de nota seleccionado */}
-        <p className="plantilla-tipo-seleccionado">
-          Tipo seleccionado: <span className="plantilla-tipo-valor">{tipoNota === "publica" ? "Nota Pública" : "Nota Interna"}</span>
-        </p>
       </div>
+
+      {/* Marca de Agua SIGED */}
 
       {/* Modal para agregar/modificar plantillas */}
       {mostrarModal && (
         <div className="modal-overlay" onClick={() => setMostrarModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* Header del modal */}
+          <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{modoModal === "agregar" ? "Agregar Plantilla" : "Modificar Plantilla"}</h2>
-              {/* Botón para cerrar modal */}
-              <button className="modal-close-btn" onClick={() => setMostrarModal(false)}>
-                ×
+              <h2 className="text-xl font-bold text-white">
+                {modoModal === "agregar" ? "NUEVA PLANTILLA" : "EDITAR PLANTILLA"}
+              </h2>
+              <button className="close-btn material-symbols-outlined" onClick={() => setMostrarModal(false)}>close</button>
+            </div>
+
+            <div className="modal-body space-y-4 p-6">
+              <div className="field">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Nombre de la Novedad</label>
+                <input
+                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 text-white outline-none focus:border-primary transition-colors"
+                  value={formData.novedad}
+                  onChange={(e) => setFormData({ ...formData, novedad: e.target.value })}
+                  placeholder="Ej: Caída de Sistema"
+                />
+              </div>
+
+              <div className="field">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Contenido Nota Pública</label>
+                <textarea
+                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 text-white outline-none focus:border-primary transition-colors"
+                  rows={4}
+                  value={formData.nota_publica}
+                  onChange={(e) => setFormData({ ...formData, nota_publica: e.target.value })}
+                  placeholder="Lo que verá el usuario final..."
+                />
+              </div>
+
+              <div className="field">
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Contenido Nota Interna</label>
+                <textarea
+                  className="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 text-white outline-none focus:border-primary transition-colors"
+                  rows={4}
+                  value={formData.nota_interna}
+                  onChange={(e) => setFormData({ ...formData, nota_interna: e.target.value })}
+                  placeholder="Información interna para el equipo..."
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer p-6 border-t border-slate-800/50 flex gap-3 justify-end">
+              <button
+                onClick={() => setMostrarModal(false)}
+                className="px-5 py-2 rounded-lg text-slate-400 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+              >
+                Cancelar
               </button>
-            </div>
-
-            {/* Cuerpo del modal con formulario */}
-            <div className="modal-body">
-              {/* Campo Nombre de la novedad */}
-              <label>Novedad:</label>
-              <input
-                value={formData.novedad}
-                onChange={(e) => setFormData({ ...formData, novedad: e.target.value })}
-                placeholder="Nombre de la plantilla..."
-              />
-
-              {/* Campo Nota Pública */}
-              <label>Nota Pública:</label>
-              <textarea
-                rows={3}
-                value={formData.nota_publica}
-                onChange={(e) => setFormData({ ...formData, nota_publica: e.target.value })}
-                placeholder="Contenido de la nota pública..."
-              />
-
-              {/* Campo Nota Interna */}
-              <label>Nota Interna:</label>
-              <textarea
-                rows={3}
-                value={formData.nota_interna}
-                onChange={(e) => setFormData({ ...formData, nota_interna: e.target.value })}
-                placeholder="Contenido de la nota interna..."
-              />
-            </div>
-
-            {/* Footer del modal con botones de acción */}
-            <div className="modal-buttons">
-              {/* Botón Guardar/Actualizar */}
-              <button onClick={handleSubmitModal} className="modal-save-button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-                  <polyline points="17 21 17 13 7 13 7 21"/>
-                  <polyline points="7 3 7 8 15 8"/>
-                </svg>
+              <button
+                onClick={handleSubmitModal}
+                className="px-6 py-2 bg-primary rounded-lg text-white text-sm font-bold uppercase tracking-widest hover:bg-blue-600 transition-colors shadow-lg shadow-primary/20"
+              >
                 {modoModal === "agregar" ? "Guardar" : "Actualizar"}
               </button>
-
-              {/* Botón Eliminar (solo en modo modificar) */}
-              {modoModal === "modificar" && (
-                <button onClick={eliminarPlantilla} className="modal-delete-button">
-                  <FaTrash style={{ marginRight: "8px" }} /> Eliminar
-                </button>
-              )}
             </div>
           </div>
         </div>

@@ -1,344 +1,264 @@
 "use client";
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "../styles/novedadesAsesor.css";
+import Modal from "./Modal";
 
-/**
- * Interfaz que define la estructura de una novedad del asesor
- * @interface Novedad
- * @property {number} id - Identificador único de la novedad (timestamp)
- * @property {string} texto - Contenido textual de la novedad
- * @property {string | null} imagen - URL de datos de la imagen adjunta o null si no hay imagen
- * @property {string} fechaHora - Fecha y hora de creación en formato local
- */
 interface Novedad {
-  id: number;
-  texto: string;
-  imagen: string | null;
-  fechaHora: string;
+  id: string;
+  novedad: string;
+  nota_avances: string;
+  usuario_id: string;
 }
 
-/**
- * Componente para gestionar novedades del asesor con funcionalidad de imágenes
- * Permite crear, visualizar y eliminar novedades con persistencia en localStorage
- * @component
- * @returns {JSX.Element} Interfaz completa de gestión de novedades
- */
-const NovedadesAsesor: React.FC = () => {
-  // --- ESTADOS DEL COMPONENTE ---
-  
-  /**
-   * Estado para el texto de la nueva novedad
-   * @state {string}
-   */
-  const [texto, setTexto] = useState<string>("");
-  
-  /**
-   * Estado para la imagen adjunta en formato data URL
-   * @state {string | null}
-   */
-  const [imagen, setImagen] = useState<string | null>(null);
-  
-  /**
-   * Estado que almacena la lista completa de novedades
-   * @state {Novedad[]}
-   */
+interface NovedadesAsesorProps {
+  torre: string;
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+// --- ICONOS SVG ---
+const FileTextIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13"></line>
+    <line x1="16" y1="17" x2="8" y2="17"></line>
+    <polyline points="10 9 9 9 8 9"></polyline>
+  </svg>
+);
+
+const PlusIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+);
+
+const Trash2Icon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+);
+
+const CopyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+);
+
+const NovedadesAsesor: React.FC<NovedadesAsesorProps> = ({ torre }) => {
   const [novedades, setNovedades] = useState<Novedad[]>([]);
-  
-  /**
-   * Estado que controla la visibilidad del modal de creación
-   * @state {boolean}
-   */
-  const [modalAbierto, setModalAbierto] = useState<boolean>(false);
-  
-  /**
-   * Estado que indica si los datos ya fueron cargados desde localStorage
-   * @state {boolean}
-   */
-  const [cargado, setCargado] = useState<boolean>(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [textoNovedad, setTextoNovedad] = useState("");
+  const [terminoBusqueda, setTerminoBusqueda] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCargandoMejora, setIsCargandoMejora] = useState(false);
+  const [base64Image, setBase64Image] = useState<string | null>(null);
+  const [mimeType, setMimeType] = useState<string | null>(null);
 
-  // --- EFECTOS DE PERSISTENCIA ---
+  const usuario = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("usuario") || "null") : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const usuario_id = usuario?.id;
 
-  /**
-   * Efecto para cargar novedades desde localStorage al montar el componente
-   * Solo se ejecuta en el cliente (evita errores de SSR)
-   */
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const guardadas = localStorage.getItem("novedadesAsesor");
-      if (guardadas) {
-        try {
-          // Parsear y establecer novedades guardadas
-          setNovedades(JSON.parse(guardadas));
-        } catch (error) {
-          console.error("Error al parsear las novedades:", error);
-        }
+  const STORAGE_KEY = "novedades_asesor_local";
+
+  const cargarNovedades = useCallback(() => {
+    setIsLoading(true);
+    try {
+      const storedNovedades = localStorage.getItem(STORAGE_KEY);
+      if (storedNovedades) {
+        setNovedades(JSON.parse(storedNovedades));
+      } else {
+        setNovedades([]);
       }
-      setCargado(true);
+    } catch (error) {
+      console.error("Error al cargar novedades de LocalStorage:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  /**
-   * Efecto para guardar novedades en localStorage cuando cambian
-   * Solo se ejecuta después de que los datos han sido cargados inicialmente
-   */
   useEffect(() => {
-    if (cargado && typeof window !== "undefined") {
-      localStorage.setItem("novedadesAsesor", JSON.stringify(novedades));
+    cargarNovedades();
+  }, [cargarNovedades]);
+
+  const manejarGuardar = () => {
+    if (!textoNovedad.trim()) return;
+    try {
+      const nuevaNovedad: Novedad = {
+        id: Date.now().toString(),
+        novedad: `Novedad de Asesor - ${new Date().toLocaleDateString()}`,
+        nota_avances: textoNovedad.trim(),
+        usuario_id: usuario_id || "local_user",
+      };
+
+      const nuevasNovedades = [nuevaNovedad, ...novedades];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevasNovedades));
+
+      setNovedades(nuevasNovedades);
+      setTextoNovedad("");
+      setBase64Image(null);
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error al guardar novedad en LocalStorage:", error);
     }
-  }, [novedades, cargado]);
-
-  // --- MANEJADORES DE EVENTOS ---
-
-  /**
-   * Maneja la selección de archivos de imagen y los convierte a data URL
-   * @function
-   * @param {ChangeEvent<HTMLInputElement>} e - Evento de cambio del input file
-   */
-  const handleImagenChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Crear FileReader para convertir imagen a data URL
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagen(reader.result as string);
-    };
-    reader.readAsDataURL(file);
   };
 
-  /**
-   * Agrega una nueva novedad a la lista
-   * @function
-   */
-  const agregarNovedad = () => {
-    // Validar que haya texto antes de guardar
-    if (texto.trim() === "") {
-      alert("Por favor escribe algo antes de guardar");
-      return;
+  const eliminarNovedad = (id: string) => {
+    if (!window.confirm("¿Estás seguro de eliminar esta novedad?")) return;
+    try {
+      const nuevasNovedades = novedades.filter((nov) => nov.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevasNovedades));
+      setNovedades(nuevasNovedades);
+    } catch (error) {
+      console.error("Error al eliminar novedad de LocalStorage:", error);
     }
+  };
 
-    // Obtener fecha y hora actual formateada
-    const ahora = new Date();
-    const fecha = ahora.toLocaleDateString("es-CO"); // Formato colombiano
-    const hora = ahora.toLocaleTimeString("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true, // Formato 12 horas con AM/PM
+  const copiarAlPortapapeles = (texto: string) => {
+    navigator.clipboard.writeText(texto).then(() => {
+      alert("Texto copiado al portapapeles");
     });
-
-    // Crear objeto de nueva novedad
-    const nuevaNovedad: Novedad = {
-      id: Date.now(), // Usar timestamp como ID único
-      texto,
-      imagen,
-      fechaHora: `${fecha} ${hora}`,
-    };
-
-    // Agregar nueva novedad al inicio del array y limpiar formulario
-    setNovedades([nuevaNovedad, ...novedades]);
-    setTexto("");
-    setImagen(null);
-    setModalAbierto(false);
   };
 
-  /**
-   * Elimina una novedad con confirmación del usuario
-   * @function
-   * @param {number} id - ID de la novedad a eliminar
-   */
-  const eliminarNovedad = (id: number) => {
-    if (confirm("¿Estás seguro de eliminar esta novedad?")) {
-      setNovedades(novedades.filter((n) => n.id !== id));
+  const mejorarConIA = async () => {
+    if (!textoNovedad.trim()) return;
+    setIsCargandoMejora(true);
+    try {
+      const response = await fetch(`${API_URL}/api/ia/mejorar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ texto: textoNovedad, modo: "mejorar" }),
+      });
+      const data = await response.json();
+      if (data.textoMejorado) setTextoNovedad(data.textoMejorado);
+    } catch (error) {
+      console.error("Error al mejorar con IA:", error);
+    } finally {
+      setIsCargandoMejora(false);
     }
   };
 
-  /**
-   * Cierra el modal y limpia los campos del formulario
-   * @function
-   */
-  const cerrarModal = () => {
-    setModalAbierto(false);
-    setTexto("");
-    setImagen(null);
+  const manejarArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBase64Image(reader.result as string);
+        setMimeType(file.type);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  // --- RENDERIZADO DEL COMPONENTE ---
+  const procesarOCR = async () => {
+    if (!base64Image || !mimeType) return;
+    setIsCargandoMejora(true);
+    try {
+      const base64Clean = base64Image.split(",")[1];
+      const response = await fetch(`${API_URL}/api/ia/ocr`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ base64Image: base64Clean, mimeType }),
+      });
+      const data = await response.json();
+      if (data.textoMejorado) setTextoNovedad(data.textoMejorado);
+    } catch (error) {
+      console.error("Error OCR:", error);
+    } finally {
+      setIsCargandoMejora(false);
+    }
+  };
+
+  const novedadesFiltradas = novedades.filter((nov) =>
+    nov.nota_avances.toLowerCase().includes(terminoBusqueda.toLowerCase())
+  );
+
   return (
-    <div className="novedades-container">
-      {/* Header del componente */}
-      <div className="novedades-header">
-        <div className="novedades-header-left">
-          {/* Icono del header */}
-          <span className="novedades-header-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-            </svg>
-          </span>
-          {/* Título y descripción */}
-          <div>
-            <h2 className="novedades-titulo">Novedades del Asesor</h2>
-            <p className="novedades-descripcion">Crea y administra novedades importantes</p>
-          </div>
-        </div>
-        {/* Botón para abrir modal de nueva novedad */}
-        <button className="btn-agregar-header" onClick={() => setModalAbierto(true)}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          Agregar Novedad
-        </button>
-      </div>
-
-      {/* Contenido principal */}
+    <div className="novedades-asesor-container">
       <div className="novedades-content">
-        <div className="novedades-content-inner">
-          {/* Sección de historial de novedades */}
-          <div className="novedades-historial">
-            <div className="novedades-historial-header">
-              {/* Icono del historial */}
-              <div className="novedades-historial-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                </svg>
-              </div>
-              <h3 className="novedades-historial-titulo">Historial de Novedades</h3>
+        <div className="novedades-header">
+          <div className="novedades-title-section">
+            <div className="novedades-icon"><FileTextIcon /></div>
+            <div className="novedades-title-text">
+              <h1>Novedades de Asesor</h1>
+              <p>Registro y gestión de incidencias torre {torre}</p>
             </div>
-
-            {/* Estado vacío cuando no hay novedades */}
-            {novedades.length === 0 ? (
-              <div className="novedades-vacio">
-                <svg className="novedades-vacio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                </svg>
-                <p className="novedades-vacio-texto">No hay novedades aún</p>
-                <p className="novedades-vacio-subtexto">
-                  Crea tu primera novedad usando el botón de arriba
-                </p>
-              </div>
-            ) : (
-              /* Lista de novedades existentes */
-              <ul className="novedades-lista">
-                {novedades.map((n) => (
-                  <li key={n.id} className="novedades-item">
-                    {/* Header de cada novedad con fecha y botón eliminar */}
-                    <div className="novedades-item-header">
-                      <div className="novedades-item-fecha">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="10"/>
-                          <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        {n.fechaHora}
-                      </div>
-                      {/* Botón para eliminar novedad individual */}
-                      <button
-                        className="btn-eliminar-item"
-                        onClick={() => eliminarNovedad(n.id)}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="3 6 5 6 21 6"/>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        </svg>
-                        Eliminar
-                      </button>
-                    </div>
-                    {/* Texto de la novedad */}
-                    <p className="novedades-item-texto">{n.texto}</p>
-                    {/* Imagen adjunta (si existe) */}
-                    {n.imagen && (
-                      <div className="novedades-item-imagen">
-                        <img src={n.imagen} alt="novedad" />
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
+          <button className="agregar-button" onClick={() => setModalOpen(true)}>
+            <PlusIcon /> Agregar Novedad
+          </button>
         </div>
+
+        <div className="busqueda-section">
+          <div className="busqueda-wrapper">
+            <SearchIcon />
+            <input type="text" placeholder="Buscar novedades..." value={terminoBusqueda} onChange={(e) => setTerminoBusqueda(e.target.value)} />
+          </div>
+          <div className="stats-pill">Total: {novedades.length}</div>
+        </div>
+
+        {isLoading ? (
+          <div className="loading-state">Cargando novedades...</div>
+        ) : novedadesFiltradas.length === 0 ? (
+          <div className="empty-state">
+            <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#475569' }}>inventory_2</span>
+            <p>No se encontraron novedades</p>
+          </div>
+        ) : (
+          <div className="novedades-grid">
+            {novedadesFiltradas.map((nov) => (
+              <div key={nov.id} className="novedad-card">
+                <p className="novedad-texto">{nov.nota_avances}</p>
+                <div className="novedad-footer">
+                  <button onClick={() => copiarAlPortapapeles(nov.nota_avances)} className="btn-icon" title="Copiar"><CopyIcon /> <span>Copiar</span></button>
+                  <button onClick={() => eliminarNovedad(nov.id)} className="btn-icon delete" title="Eliminar"><Trash2Icon /> <span>Eliminar</span></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Modal para crear nueva novedad */}
-      {modalAbierto && (
-        <div className="modal-overlay" onClick={cerrarModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* Header del modal */}
-            <div className="modal-header">
-              <h3 className="modal-titulo">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Nueva Novedad
-              </h3>
-              {/* Botón para cerrar modal */}
-              <button className="modal-close-btn" onClick={cerrarModal}>
-                ×
-              </button>
-            </div>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Nueva Novedad">
+        <div className="modal-body-custom">
+          <textarea value={textoNovedad} onChange={(e) => setTextoNovedad(e.target.value)} placeholder="Describe la novedad aquí..." rows={6} className="novedad-textarea" />
 
-            {/* Cuerpo del modal con formulario */}
-            <div className="modal-body">
-              {/* Textarea para el contenido de la novedad */}
-              <textarea
-                className="novedades-textarea"
-                rows={5}
-                placeholder="Escribe la novedad..."
-                value={texto}
-                onChange={(e) => setTexto(e.target.value)}
-              />
-
-              {/* Input para adjuntar imagen */}
-              <div className="novedades-imagen-label">
-                <span className="novedades-imagen-label-text">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                  Adjuntar imagen (opcional)
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImagenChange}
-                  className="novedades-imagen-input"
-                />
-              </div>
-
-              {/* Preview de la imagen seleccionada */}
-              {imagen && (
-                <div className="novedades-preview">
-                  <img src={imagen} alt="preview" />
-                </div>
-              )}
-            </div>
-
-            {/* Footer del modal con botones de acción */}
-            <div className="modal-footer">
-              {/* Botón cancelar */}
-              <button className="btn-modal btn-cancelar" onClick={cerrarModal}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-                Cancelar
-              </button>
-              {/* Botón guardar */}
-              <button className="btn-modal btn-guardar" onClick={agregarNovedad}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                Guardar Novedad
-              </button>
+          <div className="ia-tools">
+            <button onClick={mejorarConIA} disabled={isCargandoMejora} className="btn-ia">
+              {isCargandoMejora ? "🚀 Procesando..." : "🤖 Mejorar con IA"}
+            </button>
+            <div className="ocr-tool">
+              <input type="file" accept="image/*" onChange={manejarArchivo} id="file-upload" />
+              <label htmlFor="file-upload" className="btn-file">🖼️ Cargar Imagen</label>
+              {base64Image && <button onClick={procesarOCR} className="btn-ocr">✨ Extraer Texto</button>}
             </div>
           </div>
+
+          <div className="modal-actions">
+            <button onClick={() => setModalOpen(false)} className="btn-cancelar">Cancelar</button>
+            <button onClick={manejarGuardar} className="btn-guardar">Guardar Novedad</button>
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

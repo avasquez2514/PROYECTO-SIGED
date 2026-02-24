@@ -1,537 +1,462 @@
-/* =============================== */
-/* CONTENEDOR GENERAL DE LA VISTA */
-/* =============================== */
+/* ===================================================== */
+/*  PlantillasAdicionales — Premium Dark Style           */
+/* ===================================================== */
 
-/* Contenedor principal de la vista con fondo degradado oscuro. */
-.plantilla-container {
-  min-height: 67vh;
-  background: linear-gradient(
-    to bottom right,
-    #0f172a 0%,
-    #1e293b 50%,
-    #0f172a 100%
-  );
-  padding: 1.5rem;
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+/* CONTENEDOR PRINCIPAL */
+.plantilla-containerr {
+  min-height: 100vh;
+  background: transparent;
+  padding: 2.5rem 3rem;
+  font-family: "Inter", "Segoe UI", sans-serif;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-/* Centra el contenido principal limitando su ancho máximo. */
 .plantilla-content {
-  max-width: 90rem;
+  width: 100%;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
-/* =============================== */
-/* HEADER - REORGANIZADO */
-/* =============================== */
+/* ============================== */
+/* HEADER                         */
+/* ============================== */
 .plantilla-header {
-  margin-bottom: 2rem;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
 }
 
-/* Contenedor flex para el ícono y el título. */
 .plantilla-title-section {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  gap: 1rem;
 }
 
-/* Estilo del ícono (fondo degradado, sombra, redondeado). */
+/* Icono naranja */
 .plantilla-icon {
-  background: linear-gradient(to bottom right, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   padding: 0.75rem;
   border-radius: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px -4px rgba(249, 115, 22, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Tamaño y color del SVG dentro del ícono. */
 .plantilla-icon svg {
   width: 1.5rem;
   height: 1.5rem;
   color: white;
 }
 
-/* Estilos para el título principal (h1) y subtítulo (p). */
 .plantilla-title-text h1 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  color: white;
-  margin: 0;
+  color: #ffffff;
+  margin: 0 0 0.2rem 0;
+  letter-spacing: -0.01em;
 }
 
 .plantilla-title-text p {
-  font-size: 0.99rem;
-  color: #ffffff;
-  margin: 0 0 1rem 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
 }
 
-/* BOTÓN AGREGAR DEBAJO DEL SUBTÍTULO */
-/* Contenedor para alinear el botón 'Agregar'. */
-.agregar-button-container {
-  display: flex;
-  justify-content: flex-start;
-}
-
-/* Estilo principal del botón 'Agregar' (degradado, sombra, hover). */
+/* Botón agregar */
 .agregar-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(to right, #475569 0%, #334155 100%);
-  color: white;
-  font-weight: 500;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.75rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-  border: none;
+  background: transparent;
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 0.6rem;
+  border: 1.5px solid #38bdf8;
   cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
 }
 
-/* Efecto hover: invierte degradado y eleva ligeramente. */
 .agregar-button:hover {
-  background: linear-gradient(to right, #334155 0%, #475569 100%);
+  background: rgba(56, 189, 248, 0.08);
   transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
 }
 
-/* Tamaño del SVG dentro del botón 'Agregar'. */
 .agregar-button svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1rem;
+  height: 1rem;
 }
 
-/* =============================== */
-/* FORMULARIO NUEVA PLANTILLA */
-/* =============================== */
-/* Contenedor del formulario (fondo translúcido, sombra, borde). */
+/* ============================== */
+/* FORMULARIO NUEVA PLANTILLA     */
+/* ============================== */
 .plantilla-formulario {
-  background: rgba(30, 41, 59, 0.5);
+  background: rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(12px);
   border-radius: 1rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(51, 65, 85, 0.5);
+  border: 1px solid rgba(51, 65, 85, 0.6);
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  animation: slideDown 0.3s ease-out;
+  margin-bottom: 2rem;
+  animation: slideDown 0.25s ease-out;
 }
 
-/* Animación de aparición (fade in y slide vertical). */
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Estilo base para inputs y textareas (fondo oscuro, borde). */
 .plantilla-formulario input,
 .plantilla-formulario textarea {
   width: 100%;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid #475569;
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: white;
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid #334155;
+  border-radius: 0.6rem;
+  padding: 0.7rem 1rem;
+  color: #e2e8f0;
   font-size: 0.875rem;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
+  margin-bottom: 0.85rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
-/* Color del texto placeholder. */
 .plantilla-formulario input::placeholder,
 .plantilla-formulario textarea::placeholder {
-  color: #64748b;
+  color: #475569;
 }
 
-/* Estilo al enfocar: borde naranja y sombra exterior. */
 .plantilla-formulario input:focus,
 .plantilla-formulario textarea:focus {
   outline: none;
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
 }
 
-/* Estilos específicos del textarea (resize vertical, altura mínima). */
 .plantilla-formulario textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 110px;
   font-family: inherit;
 }
 
-/* Contenedor flex para los botones de guardar/cancelar. */
 .plantilla-formulario-botones {
   display: flex;
   gap: 0.75rem;
 }
 
-/* Estilo del botón 'Guardar' (color naranja, hover). */
 .btn-guardar {
   flex: 1;
-  background: linear-gradient(to right, #f59e0b 0%, #f59e0b 100%);
+  background: #10b981;
   color: white;
-  font-weight: 500;
-  padding: 0.625rem 1rem;
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 0.6rem 1rem;
   border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
   border: none;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-guardar:hover {
-  background: linear-gradient(to right, #d97706 0%, #d97706 100%);
+  background: #059669;
 }
 
-/* Estilo del botón 'Cancelar' (color gris, hover). */
 .btn-cancelar {
-  padding: 0.625rem 1rem;
-  background: #475569;
-  color: white;
+  padding: 0.6rem 1.2rem;
+  background: #334155;
+  color: #94a3b8;
+  font-size: 0.82rem;
   border-radius: 0.5rem;
-  transition: background 0.3s ease;
   border: none;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-cancelar:hover {
-  background: #334155;
+  background: #1e293b;
 }
 
-/* =============================== */
-/* LISTA DE PLANTILLAS - 3 COLUMNAS */
-/* =============================== */
-/* Grilla (Grid) para la lista de plantillas (3 columnas). */
+/* ============================== */
+/* GRID DE TARJETAS               */
+/* ============================== */
 .plantilla-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-/* Estilo de cada tarjeta/item de plantilla (fondo, sombra, borde). */
+/* Tarjeta individual */
 .plantilla-item {
-  background: linear-gradient(
-    to right bottom,
-    rgb(3 4 6),
-    rgb(31 50 80),
-    rgb(15, 23, 42)
-  );
-  backdrop-filter: blur(12px);
+  background: linear-gradient(160deg, #080f1f 0%, #0d1830 60%, #071223 100%);
+  border: 1px solid rgba(51, 65, 85, 0.45);
   border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(51, 65, 85, 0.5);
   padding: 1.5rem;
-  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  height: fit-content;
-  min-height: 200px;
+  transition: all 0.25s ease;
+  cursor: grab;
+  min-height: 220px;
 }
 
-/* Efecto hover en la tarjeta (cambio de borde, elevación). */
 .plantilla-item:hover {
-  border-color: rgba(71, 85, 105, 0.5);
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.6);
   transform: translateY(-2px);
 }
 
-/* Estilo visual al arrastrar (Drag and Drop). */
 .plantilla-item.dragging {
   opacity: 0.5;
-  transform: rotate(2deg);
+  transform: rotate(1.5deg) scale(1.02);
+  cursor: grabbing;
 }
 
-/* Contenedor interno de la tarjeta (flex, columna). */
+/* Contenido de la tarjeta */
 .plantilla-contenido {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
   flex: 1;
 }
 
-/* Estilo del título (nombre) de la plantilla. */
+/* Nombre de la plantilla en chip uppercase */
 .plantilla-nombre {
-  color: white;
-  font-weight: 600;
-  font-size: 1.1rem;
+  color: #93c5fd;
+  font-weight: 700;
+  font-size: 0.72rem;
   margin: 0;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
-  padding-bottom: 0.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
 }
 
-/* Estilo del texto (cuerpo) de la plantilla, con truncado de 8 líneas. */
+/* Texto de la plantilla */
 .plantilla-texto {
-  color: #cbd5e1;
-  font-size: 0.875rem;
-  line-height: 1.6;
+  color: #ffffff;
+  font-size: 0.84rem;
+  line-height: 1.65;
   white-space: pre-wrap;
   margin: 0;
   word-break: break-word;
   flex: 1;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 8;
+  -webkit-line-clamp: 9;
+  line-clamp: 9;
   -webkit-box-orient: vertical;
 }
 
-/* Contenedor flex para los botones de acción de la tarjeta. */
+/* Botones de acción */
 .plantilla-buttons {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 0.6rem;
   margin-top: auto;
 }
 
-/* Estilo base común para los botones de la tarjeta (copiar, editar, etc.). */
 .plantilla-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  border: none;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 0.55rem;
   cursor: pointer;
-  color: white;
   flex: 1;
-  min-width: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Tamaño de íconos en botones de tarjeta. */
 .plantilla-button svg {
-  width: 0.875rem;
-  height: 0.875rem;
+  flex-shrink: 0;
+  opacity: 0.9;
 }
 
-/* Colores específicos para botones: Copiar (verde) */
+/* COPIAR — azul oscuro */
 .plantilla-button.copy {
-  background: #10b981;
+  background: rgba(30, 58, 95, 0.55);
+  border: 1.5px solid rgba(56, 130, 210, 0.55);
+  color: #93c5fd;
+  box-shadow: inset 0 0 0 0 rgba(56, 130, 210, 0);
 }
 
 .plantilla-button.copy:hover {
-  background: #059669;
+  background: rgba(30, 58, 95, 0.85);
+  border-color: rgba(96, 165, 250, 0.8);
+  color: #bfdbfe;
+  box-shadow: 0 0 14px -2px rgba(56, 130, 210, 0.4);
+  transform: translateY(-1px);
 }
 
-/* Editar (naranja) */
+/* EDITAR — ámbar */
 .plantilla-button.edit {
-  background: #f59e0b;
+  background: rgba(80, 50, 5, 0.55);
+  border: 1.5px solid rgba(217, 119, 6, 0.6);
+  color: #fcd34d;
+  box-shadow: inset 0 0 0 0 rgba(245, 158, 11, 0);
 }
 
 .plantilla-button.edit:hover {
-  background: #d97706;
+  background: rgba(80, 50, 5, 0.9);
+  border-color: rgba(251, 191, 36, 0.85);
+  color: #fde68a;
+  box-shadow: 0 0 14px -2px rgba(245, 158, 11, 0.4);
+  transform: translateY(-1px);
 }
 
-/* Limpiar (rojo) */
+/* ELIMINAR — rojo oscuro */
 .plantilla-button.clear {
-  background: #ef4444;
+  background: rgba(80, 10, 10, 0.55);
+  border: 1.5px solid rgba(220, 38, 38, 0.55);
+  color: #fca5a5;
+  box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0);
 }
 
 .plantilla-button.clear:hover {
-  background: #dc2626;
+  background: rgba(80, 10, 10, 0.9);
+  border-color: rgba(248, 113, 113, 0.85);
+  color: #fecaca;
+  box-shadow: 0 0 14px -2px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
 }
 
-/* =============================== */
-/* EMPTY STATE */
-/* =============================== */
-/* Estilos para el mensaje de 'Estado Vacío' (cuando no hay plantillas). */
+/* ============================== */
+/* EMPTY STATE                    */
+/* ============================== */
 .empty-state {
   text-align: center;
-  padding: 4rem 0;
+  padding: 5rem 0;
   grid-column: 1 / -1;
 }
 
-/* Estilos del ícono y texto del estado vacío. */
 .empty-state svg {
-  width: 4rem;
-  height: 4rem;
-  color: #334155;
+  width: 3.5rem;
+  height: 3.5rem;
+  color: #1e293b;
   margin: 0 auto 1rem;
 }
 
 .empty-state p:first-of-type {
-  color: #94a3b8;
-  font-weight: 500;
-  margin-bottom: 0.25rem;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
 }
 
 .empty-state p:last-of-type {
-  color: #64748b;
-  font-size: 0.875rem;
+  color: #334155;
+  font-size: 0.85rem;
 }
 
-/* =============================== */
-/* FOOTER */
-/* =============================== */
-/* Estilos del pie de página (texto centrado, color). */
+/* ============================== */
+/* FOOTER — TOTAL PLANTILLAS      */
+/* ============================== */
 .plantilla-footer {
-  margin-top: 2rem;
   text-align: center;
-  grid-column: 1 / -1;
+  margin-top: 1rem;
 }
 
 .plantilla-footer p {
-  color: #ffffff;
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(51, 65, 85, 0.4);
+  border-radius: 100px;
+  padding: 0.45rem 1.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #64748b;
 }
 
 .plantilla-footer span {
-  color: #fbbf24;
-  font-weight: 600;
+  color: #f97316;
+  font-size: 1rem;
+  font-weight: 800;
 }
 
-/* =============================== */
-/* MODAL */
-/* =============================== */
-/* Contenedor flex para los botones dentro del modal. */
+/* ============================== */
+/* MODAL                          */
+/* ============================== */
 .modal-buttons {
   display: flex;
   gap: 0.75rem;
   margin-top: 1rem;
 }
 
-/* Estilo del botón 'Guardar' en el modal (naranja). */
 .modal-save-button {
   flex: 1;
-  background: linear-gradient(to right, #f59e0b 0%, #f59e0b 100%);
+  background: #10b981;
   color: white;
-  font-weight: 500;
-  padding: 0.625rem 1rem;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
   border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
   border: none;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .modal-save-button:hover {
-  background: linear-gradient(to right, #d97706 0%, #d97706 100%);
+  background: #059669;
 }
 
-/* Estilo del botón 'Eliminar' en el modal (rojo). */
 .modal-delete-button {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.625rem 1rem;
+  padding: 0.65rem 1rem;
   background: #ef4444;
   color: white;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 0.5rem;
-  transition: all 0.3s ease;
   border: none;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .modal-delete-button:hover {
   background: #dc2626;
 }
 
-/* Estilos para inputs/textareas DENTRO del componente Modal. */
-Modal input,
-Modal textarea {
-  width: 100%;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid #475569;
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: white;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-/* Estilo para etiquetas (labels) DENTRO del componente Modal. */
-Modal label {
-  color: white;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-/* =============================== */
-/* RESPONSIVE */
-/* =============================== */
-
-/* Tablet (Grande): Cambia la grilla a 2 columnas. */
-@media (max-width: 1200px) {
-  .plantilla-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Tablet (Pequeña): Cambia la grilla a 1 columna y botones a ancho completo. */
-@media (max-width: 768px) {
-  .plantilla-container {
-    padding: 1rem;
-  }
-
-  .plantilla-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .agregar-button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .plantilla-formulario-botones {
-    flex-direction: column;
-  }
-
-  .btn-guardar,
-  .btn-cancelar {
-    width: 100%;
-  }
-
+/* ============================== */
+/* RESPONSIVE                     */
+/* ============================== */
+@media (max-width: 900px) {
   .plantilla-list {
     grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .plantilla-buttons {
-    width: 100%;
-  }
-
-  .plantilla-button {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .modal-buttons {
-    flex-direction: column;
-  }
-
-  .modal-save-button,
-  .modal-delete-button {
-    width: 100%;
   }
 }
 
-/* Móvil: Reduce padding y apila botones de tarjeta. */
-@media (max-width: 480px) {
-  .plantilla-item {
-    padding: 1rem;
+@media (max-width: 640px) {
+  .plantilla-containerr {
+    padding: 1.5rem 1rem;
   }
 
   .plantilla-buttons {
     flex-direction: column;
-  }
-
-  .plantilla-button {
-    width: 100%;
   }
 }

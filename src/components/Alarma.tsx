@@ -36,18 +36,21 @@ interface SonidoPersonalizado {
 const Alarma: React.FC = () => {
   // Estado para la hora de la nueva alarma
   const [nuevaHora, setNuevaHora] = useState<string>("");
-  
+
   // Estado para el nombre de la nueva alarma
   const [nombreAlarma, setNombreAlarma] = useState<string>("");
-  
+
   // Estado para la ruta del sonido predeterminado (constante)
   const [sonidoPredeterminado] = useState<string>("/Sonidos/default.mp3");
-  
+
   // Estado para el sonido seleccionado actualmente
   const [sonidoSeleccionado, setSonidoSeleccionado] = useState<string>("/Sonidos/default.mp3");
-  
+
   // Estado para controlar el audio que se está reproduciendo actualmente
   const [audioEnReproduccion, setAudioEnReproduccion] = useState<HTMLAudioElement | null>(null);
+
+  // Estado para la alarma que está sonando en este momento
+  const [currentAlarmaActiva, setCurrentAlarmaActiva] = useState<AlarmaItem | null>(null);
 
   /**
    * Estado para gestionar los sonidos personalizados cargados por el usuario
@@ -93,7 +96,6 @@ const Alarma: React.FC = () => {
 
   /**
    * Función para detener la alarma que se está reproduciendo actualmente
-   * Pausa el audio y resetea el tiempo de reproducción
    */
   const detenerAlarma = () => {
     if (audioEnReproduccion) {
@@ -101,20 +103,15 @@ const Alarma: React.FC = () => {
       audioEnReproduccion.currentTime = 0;
       setAudioEnReproduccion(null);
     }
+    setCurrentAlarmaActiva(null);
   };
 
   /**
-   * Muestra una pantalla de alarma cuando se activa una alarma programada
+   * Activa una alarma programada
    * @param {AlarmaItem} alarma - Objeto alarma que se está activando
    */
-  const mostrarPantallaAlarma = (alarma: AlarmaItem) => {
-    // Crear mensaje descriptivo para la alarma
-    const mensaje = `⏰ ${alarma.nombre || "¡Alarma activada!"} - ${alarma.hora}`;
-    
-    // Crear overlay visual para la alarma
-    const overlay = document.createElement("div");
-    overlay.className = "alarma-overlay";
-    overlay.innerText = mensaje;
+  const activarAlarma = (alarma: AlarmaItem) => {
+    setCurrentAlarmaActiva(alarma);
 
     // Determinar qué sonido usar (personalizado o predeterminado)
     const sonidoURL =
@@ -127,17 +124,6 @@ const Alarma: React.FC = () => {
     audio.loop = true;
     audio.play().catch((e) => console.error("Error reproduciendo sonido:", e));
     setAudioEnReproduccion(audio);
-
-    // Configurar evento para cerrar la alarma al hacer click
-    overlay.addEventListener("click", () => {
-      audio.pause();
-      audio.currentTime = 0;
-      setAudioEnReproduccion(null);
-      document.body.removeChild(overlay);
-    });
-
-    // Agregar el overlay al DOM
-    document.body.appendChild(overlay);
   };
 
   /**
@@ -147,21 +133,16 @@ const Alarma: React.FC = () => {
   useEffect(() => {
     const intervalo = setInterval(() => {
       const ahora = new Date();
-      // Obtener hora actual en formato HH:MM
       const horaActual = ahora.toTimeString().slice(0, 5);
 
-      // Verificar cada alarma programada
       alarmas.forEach((alarma, index) => {
-        // Si la hora coincide y la alarma no ha sido activada recientemente
         if (alarma.hora === horaActual && !activadas.includes(index)) {
-          mostrarPantallaAlarma(alarma);
-          // Marcar alarma como activada para evitar repeticiones
+          activarAlarma(alarma);
           setActivadas((prev) => [...prev, index]);
         }
       });
-    }, 1000); // Verificar cada segundo
+    }, 1000);
 
-    // Cleanup: limpiar intervalo cuando el componente se desmonte
     return () => clearInterval(intervalo);
   }, [alarmas, activadas]);
 
@@ -190,7 +171,7 @@ const Alarma: React.FC = () => {
     const actualizados = [...sonidos, nuevoSonido];
     setSonidos(actualizados);
     localStorage.setItem("sonidos", JSON.stringify(actualizados));
-    
+
     // Seleccionar automáticamente el nuevo sonido
     setSonidoSeleccionado(url);
   };
@@ -253,49 +234,44 @@ const Alarma: React.FC = () => {
       <div className="alarm-wrapper-inner">
         {/* Tarjeta principal del formulario */}
         <div className="alarm-card">
-          
+
           {/* Encabezado con icono y texto descriptivo */}
           <div className="alarm-header">
             <span className="alarm-header-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
             </span>
             <div className="alarm-header-text">
-              <h1>Gestión de Alarmas</h1>
-              <p>Crea y administra tus alarmas personalizadas</p>
+              <h1>GESTIÓN DE ALARMAS</h1>
+              <p>CREA Y ADMINISTRA TUS ALARMAS PERSONALIZADAS</p>
             </div>
           </div>
 
           {/* Formulario de creación de alarmas */}
           <div className="alarm-form">
-            
+
             {/* Sección: Hora y Nombre de la alarma */}
             <div className="form-section">
               <label className="section-label" htmlFor="alarm-time">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                Hora de la alarma y nombre
+                <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>schedule</span>
+                HORA DE LA ALARMA Y NOMBRE
               </label>
-              <div className="input-group">
-                {/* Input para seleccionar hora */}
+              <div className="input-vertical-group">
                 <input
                   id="alarm-time"
                   type="time"
                   value={nuevaHora}
                   onChange={(e) => setNuevaHora(e.target.value)}
-                  className="input-time"
+                  className="input-field"
                 />
-                {/* Input para nombre descriptivo */}
                 <input
                   type="text"
                   placeholder="Ej: Reunión importante"
                   value={nombreAlarma}
                   onChange={(e) => setNombreAlarma(e.target.value)}
-                  className="input-name"
+                  className="input-field"
                 />
               </div>
             </div>
@@ -303,7 +279,8 @@ const Alarma: React.FC = () => {
             {/* Sección: Selección de sonido */}
             <div className="form-section">
               <label className="section-label" htmlFor="sound-select">
-                🔊 Sonido
+                <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>volume_up</span>
+                SONIDO DE ALARMA
               </label>
               {/* Dropdown para seleccionar sonido */}
               <select
@@ -324,7 +301,7 @@ const Alarma: React.FC = () => {
 
             {/* Sección: Carga de archivos de audio personalizados */}
             <div className="form-section">
-              <label className="section-label">Agregar sonido personalizado:</label>
+              <label className="section-label">AGREGAR SONIDO PERSONALIZADO:</label>
               <div className="drop-zone">
                 {/* Input file oculto para carga de archivos */}
                 <input
@@ -336,9 +313,14 @@ const Alarma: React.FC = () => {
                 />
                 {/* Área visual para drag & drop o click */}
                 <label htmlFor="file-upload" className="drop-zone-label">
-                  <span className="upload-icon">⬆️</span>
-                  <p>Click para subir o arrastra el archivo de audio</p>
-                  <span>MP3, WAV, OGG</span>
+                  <div style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                    Seleccionar archivo <span style={{ opacity: 0.6 }}>Sin archivos seleccionados</span>
+                  </div>
+                  <span className="material-symbols-outlined upload-icon" style={{ fontSize: '2.5rem', color: '#3b82f6', margin: '0.5rem 0' }}>cloud_upload</span>
+                  <p style={{ fontSize: '1rem', fontWeight: '700', color: '#ffffff', margin: '0.25rem 0' }}>
+                    Click para subir o arrastra el archivo de audio
+                  </p>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>MP3, WAV, OGG</span>
                 </label>
               </div>
             </div>
@@ -346,14 +328,17 @@ const Alarma: React.FC = () => {
             {/* Lista de sonidos personalizados cargados */}
             {sonidos.length > 0 && (
               <div className="sounds-list-section">
-                <h4 className="sounds-list-title">🎶 Sonidos personalizados</h4>
+                <h4 className="sounds-list-title">
+                  <span className="material-symbols-outlined" style={{ fontSize: '1rem', verticalAlign: 'middle', marginRight: '0.5rem' }}>library_music</span>
+                  Sonidos personalizados
+                </h4>
                 <ul className="sonidos-lista">
                   {sonidos.map((s, index) => (
                     <li key={index} className="sonido-item">
                       <span>{s.nombre}</span>
                       {/* Botón para eliminar sonido personalizado */}
-                      <button onClick={() => eliminarSonidoPersonalizado(index)}>
-                        🗑️
+                      <button onClick={() => eliminarSonidoPersonalizado(index)} className="btn-icon-only">
+                        <span className="material-symbols-outlined" style={{ fontSize: '1.25rem' }}>delete</span>
                       </button>
                     </li>
                   ))}
@@ -363,11 +348,8 @@ const Alarma: React.FC = () => {
 
             {/* Botón principal para agregar nueva alarma */}
             <button onClick={agregarAlarma} className="add-alarm-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              Agregar Alarma
+              <span className="material-symbols-outlined" style={{ fontSize: '1.25rem' }}>add</span>
+              AGREGAR ALARMA
             </button>
           </div>
         </div>
@@ -377,8 +359,8 @@ const Alarma: React.FC = () => {
           // Estado cuando no hay alarmas programadas
           <div className="empty-state">
             <svg className="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             <h3>No hay alarmas programadas</h3>
             <p>Crea tu primera alarma usando el formulario de arriba</p>
@@ -386,6 +368,10 @@ const Alarma: React.FC = () => {
         ) : (
           // Lista de alarmas programadas
           <div className="alarm-list-container">
+            <h2 className="list-title">
+              <span className="material-symbols-outlined">notifications_active</span>
+              ALARMAS PROGRAMADAS
+            </h2>
             <ul className="alarma-lista">
               {alarmas.map((alarma, index) => (
                 <li key={index} className="alarma-item">
@@ -393,8 +379,8 @@ const Alarma: React.FC = () => {
                     {/* Icono de alarma */}
                     <div className="alarma-item-icon">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
                       </svg>
                     </div>
                     {/* Información de la alarma */}
@@ -409,8 +395,8 @@ const Alarma: React.FC = () => {
                     className="alarma-eliminar"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="3 6 5 6 21 6"/>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                     </svg>
                   </button>
                 </li>
@@ -419,6 +405,19 @@ const Alarma: React.FC = () => {
           </div>
         )}
       </div>
+      {/* Overlay de Alarma Activa */}
+      {currentAlarmaActiva && (
+        <div className="alarma-overlay" onClick={detenerAlarma}>
+          <div className="overlay-content">
+            <div className="overlay-icon">
+              <span className="material-symbols-outlined">notifications_active</span>
+            </div>
+            <h2 className="overlay-title">{currentAlarmaActiva.nombre}</h2>
+            <p className="overlay-time">{currentAlarmaActiva.hora}</p>
+            <p className="overlay-instruction">CLICK EN CUALQUIER LUGAR PARA DETENER</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
