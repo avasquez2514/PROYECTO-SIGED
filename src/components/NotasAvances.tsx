@@ -12,6 +12,7 @@ interface Nota {
   id: string;
   plantilla_id: string;
   texto: string;
+  favorito?: boolean;
 }
 
 interface NotasAvancesProps {
@@ -20,6 +21,7 @@ interface NotasAvancesProps {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 const STORAGE_KEY = "notasAvancesOrden";
+const FAVORITOS_KEY = "notasAvancesFavoritos";
 
 // --- COMPONENTES DE ICONOS SVG ---
 const FileTextIcon = () => (
@@ -64,6 +66,7 @@ const Trash2Icon = () => (
 const NotasAvances: React.FC<NotasAvancesProps> = ({ torre }) => {
   const [notasAvance, setNotasAvance] = useState<Nota[]>([]);
   const [ordenNotas, setOrdenNotas] = useState<string[]>([]);
+  const [favoritos, setFavoritos] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [textoNota, setTextoNota] = useState("");
   const [modo, setModo] = useState<"agregar" | "modificar">("agregar");
@@ -99,6 +102,12 @@ const NotasAvances: React.FC<NotasAvancesProps> = ({ torre }) => {
         setOrdenNotas([...ordenGuardada, ...nuevasIds]);
       } else {
         setOrdenNotas(filtradas.map((n: Nota) => n.id));
+      }
+
+      // Cargar favoritos de localStorage
+      const favoritosGuardados = localStorage.getItem(FAVORITOS_KEY);
+      if (favoritosGuardados) {
+        setFavoritos(JSON.parse(favoritosGuardados));
       }
     } catch (error) {
       console.error("Error al cargar notas:", error);
@@ -139,6 +148,15 @@ const NotasAvances: React.FC<NotasAvancesProps> = ({ torre }) => {
       console.error("❌ Error al eliminar nota:", error);
       alert(`Error al eliminar nota: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
+  };
+
+  const toggleFavorito = (id: string) => {
+    const nuevosFavoritos = favoritos.includes(id)
+      ? favoritos.filter(fid => fid !== id)
+      : [...favoritos, id];
+
+    setFavoritos(nuevosFavoritos);
+    localStorage.setItem(FAVORITOS_KEY, JSON.stringify(nuevosFavoritos));
   };
 
   const abrirModalAgregar = () => {
@@ -203,9 +221,20 @@ const NotasAvances: React.FC<NotasAvancesProps> = ({ torre }) => {
     setOrdenNotas(items);
   };
 
-  const notasOrdenadas = ordenNotas
-    .map(id => notasAvance.find((n: Nota) => n.id === id))
-    .filter(Boolean) as Nota[];
+  const notasOrdenadas = [...ordenNotas]
+    .map(id => {
+      const nota = notasAvance.find((n: Nota) => n.id === id);
+      if (nota) {
+        return { ...nota, favorito: favoritos.includes(id) };
+      }
+      return null;
+    })
+    .filter((n): n is Nota & { favorito: boolean } => n !== null)
+    .sort((a, b) => {
+      if (a.favorito && !b.favorito) return -1;
+      if (!a.favorito && b.favorito) return 1;
+      return 0;
+    });
 
   return (
     <div className="notas-avances-view">
@@ -265,12 +294,24 @@ const NotasAvances: React.FC<NotasAvancesProps> = ({ torre }) => {
                     <Draggable key={nota.id} draggableId={nota.id} index={index}>
                       {(provided) => (
                         <div
-                          className="nota-card-p"
+                          className={`nota-card-p ${nota.favorito ? 'is-fav' : ''}`}
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
                           <div className="card-top-p">
+                            {/* Favorito */}
+                            <button
+                              className={`fav-btn-p ${nota.favorito ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorito(nota.id);
+                              }}
+                            >
+                              <span className="material-symbols-outlined">
+                                {nota.favorito ? 'star' : 'grade'}
+                              </span>
+                            </button>
                             {/* Opcional: Etiqueta si existe */}
                             {nota.texto.toLowerCase().includes("reporte técnico") && (
                               <span className="card-tag-p">REPORTE TÉCNICO</span>

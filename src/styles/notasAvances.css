@@ -202,7 +202,57 @@
 }
 
 .card-top-p {
-  min-height: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.fav-btn-p {
+  background: transparent;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.fav-btn-p .material-symbols-outlined {
+  font-size: 1.5rem;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.fav-btn-p:hover {
+  color: #fbbf24;
+  transform: scale(1.1);
+}
+
+.fav-btn-p.active {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+}
+
+.fav-btn-p.active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.nota-card-p.is-fav {
+  border-color: rgba(251, 191, 36, 0.2);
+  background: linear-gradient(145deg, #0a0f1e 0%, #0d1428 100%);
+}
+
+.nota-card-p.is-fav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #fbbf24;
+  border-radius: 4px 0 0 4px;
 }
 
 .card-tag-p {
