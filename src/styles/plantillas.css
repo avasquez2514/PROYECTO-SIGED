@@ -33,7 +33,7 @@
 }
 
 .plantilla-card-premium {
-  background: rgb(18 20 23 / 30%);
+  background: rgb(60 72 77 / 30%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 3rem;
@@ -104,10 +104,10 @@
 
 .select-p {
   width: 100%;
-  background: #0a0f1e;
+  background: #ffffff;      
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  color: #fff;
+  color: #000000;
   padding: 1.25rem 3.5rem 1.25rem 1.5rem;
   font-size: 0.875rem;
   font-weight: 800;
@@ -120,7 +120,13 @@
 .select-p:focus {
   outline: none;
   border-color: #3b82f6;
-  background: #0d1428;
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+.select-p option {
+  background-color: #ffffff !important; /* Fondo de la lista blanco */
+  color: #000000 !important;            /* Texto de la lista oscuro */
 }
 
 .select-icon-p {
