@@ -33,7 +33,7 @@
 }
 
 .plantilla-card-premium {
-  background: #020617;
+  background: rgb(60 72 77 / 30%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 3rem;
@@ -376,4 +376,9 @@
 
 .close-btn:hover {
   color: #fff;
+}
+
+.select-p option {
+  background-color: #ffffff !important; /* Fondo de la lista blanco */
+  color: #1e293b !important;            /* Texto de la lista oscuro */
 }
