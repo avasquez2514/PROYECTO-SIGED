@@ -33,11 +33,11 @@
 }
 
 .plantilla-card-premium {
-  background: rgb(60 72 77 / 30%);
+  background: rgb(21 40 47 / 30%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 3rem;
-  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 40px 80px -20px rgb(67 104 150 / 80%);
   position: relative;
 }
 
