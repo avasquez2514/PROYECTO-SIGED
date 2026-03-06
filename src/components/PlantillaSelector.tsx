@@ -6,11 +6,6 @@ import "../styles/plantillas.css";
 
 /**
  * Interfaz que define la estructura de una plantilla de notas
- * @interface Plantilla
- * @property {string} id - Identificador único de la nota
- * @property {string} plantilla_id - ID de la plantilla asociada
- * @property {string} notaPublica - Contenido de la nota pública
- * @property {string} notaInterna - Contenido de la nota interna
  */
 interface Plantilla {
   id: string;
@@ -21,9 +16,6 @@ interface Plantilla {
 
 /**
  * Props del componente PlantillaSelector
- * @interface PlantillaSelectorProps
- * @property {string} torre - Identificador de la torre para el encabezado de notas internas
- * @property {(texto: string) => void} onSelect - Función callback que se ejecuta al seleccionar o modificar texto
  */
 interface PlantillaSelectorProps {
   torre: string;
@@ -32,94 +24,40 @@ interface PlantillaSelectorProps {
 
 /**
  * Componente selector de plantillas para gestión de notas públicas e internas
- * Permite seleccionar, crear, modificar, eliminar y copiar plantillas de texto
- * @component
- * @param {PlantillaSelectorProps} props - Props del componente
- * @returns {JSX.Element} Interfaz completa de selección y gestión de plantillas
  */
 const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }) => {
   // --- ESTADOS DEL COMPONENTE ---
 
-  /**
-   * Estado que almacena las plantillas organizadas por nombre de novedad
-   * @state {Record<string, Plantilla>}
-   */
   const [plantillas, setPlantillas] = useState<Record<string, Plantilla>>({});
-
-  /**
-   * Estado para la novedad actualmente seleccionada
-   * @state {string}
-   */
   const [notaSeleccionada, setNotaSeleccionada] = useState("");
+  
+  // CAMBIO REALIZADO: Ahora el valor inicial es "publica"
+  const [tipoNota, setTipoNota] = useState<"publica" | "interna">("publica");
 
-  /**
-   * Estado que controla el tipo de nota a mostrar (pública o interna)
-   * @state {"publica" | "interna"}
-   */
-  const [tipoNota, setTipoNota] = useState<"publica" | "interna">("interna");
-
-  /**
-   * Estado para el texto de la nota actual
-   * @state {string}
-   */
   const [textoNota, setTextoNota] = useState("");
-
-  /**
-   * Estado que indica si el texto ha sido modificado manualmente
-   * @state {boolean}
-   */
   const [textoModificado, setTextoModificado] = useState(false);
-
-  /**
-   * Estado que controla la visibilidad del modal de gestión
-   * @state {boolean}
-   */
   const [mostrarModal, setMostrarModal] = useState(false);
-
-  /**
-   * Estado que indica el modo de operación del modal
-   * @state {"agregar" | "modificar"}
-   */
   const [modoModal, setModoModal] = useState<"agregar" | "modificar">("agregar");
-
-  /**
-   * Estado para los datos del formulario del modal
-   * @state {object}
-   */
   const [formData, setFormData] = useState({
     novedad: "",
     nota_publica: "",
     nota_interna: "",
   });
 
-  /**
-   * URL base de la API para operaciones CRUD de notas
-   * @constant {string}
-   */
   const API = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/notas`;
 
-  /**
-   * Carga las plantillas desde la API y las organiza por nombre de novedad
-   * @async
-   * @function
-   * @returns {Promise<void>}
-   */
   const cargarPlantillas = async () => {
-    // Obtener datos de autenticación desde localStorage
     const token = localStorage.getItem("token");
     const usuarioRaw = localStorage.getItem("usuario");
     const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
 
-    // Validar que exista autenticación
     if (!token || !usuario?.id) return;
 
     try {
-      // Realizar petición GET a la API
       const res = await fetch(`${API}/${usuario.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Manejar errores de autenticación
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
           localStorage.removeItem("token");
@@ -132,24 +70,19 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
 
       const data = await res.json();
 
-      // Validar que la respuesta sea un array
       if (!Array.isArray(data)) {
-        console.error("Error: La respuesta de la API no es un array:", data);
         setPlantillas({});
         return;
       }
 
-      // Filtrar y organizar las plantillas válidas
       const agrupadas: Record<string, Plantilla> = {};
       data.forEach((row: any) => {
-        // Excluir plantillas adicionales y notas de avances
         const esPlantillaAdicional = row.plantilla?.trim();
         const esNotaAvances = row.nota_avances?.trim() &&
           !row.nota_publica?.trim() &&
           !row.nota_interna?.trim() &&
           !row.plantilla?.trim();
 
-        // Incluir solo notas públicas/internas regulares
         if (!esPlantillaAdicional && !esNotaAvances) {
           const novedad = row.novedad || "Sin título";
           agrupadas[novedad] = {
@@ -168,20 +101,11 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
     }
   };
 
-  /**
-   * Efecto para cargar plantillas al montar el componente
-   * Se ejecuta una vez al inicializar el componente
-   */
   useEffect(() => {
     cargarPlantillas();
   }, []);
 
-  /**
-   * Efecto para actualizar el texto de la nota cuando cambia la selección o tipo
-   * Se ejecuta cuando cambian la nota seleccionada, tipo de nota o plantillas
-   */
   useEffect(() => {
-    // Solo actualizar si hay una nota seleccionada y no ha sido modificada manualmente
     if (notaSeleccionada && plantillas[notaSeleccionada] && !textoModificado) {
       const encabezado = `Gestión-MOC-Torre ${torre}:`;
       const nota = tipoNota === "publica"
@@ -194,72 +118,40 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
 
   // --- MANEJADORES DE EVENTOS ---
 
-  /**
-   * Maneja el cambio de selección de nota en el dropdown
-   * @function
-   * @param {ChangeEvent<HTMLSelectElement>} e - Evento de cambio del select
-   */
   const handleNotaChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setNotaSeleccionada(e.target.value);
-    setTextoModificado(false); // Resetear flag de modificación manual
+    setTextoModificado(false);
   };
 
-  /**
-   * Maneja el cambio entre tipo de nota (pública o interna)
-   * @function
-   * @param {"publica" | "interna"} tipo - Tipo de nota seleccionado
-   */
   const handleTipoNotaChange = (tipo: "publica" | "interna") => {
     setTipoNota(tipo);
-    setTextoModificado(false); // Resetear flag de modificación manual
+    setTextoModificado(false);
   };
 
-  /**
-   * Maneja los cambios manuales en el textarea de la nota
-   * @function
-   * @param {ChangeEvent<HTMLTextAreaElement>} e - Evento de cambio del textarea
-   */
   const handleTextoChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setTextoNota(e.target.value);
-    setTextoModificado(true); // Marcar como modificado manualmente
+    setTextoModificado(true);
   };
 
-  /**
-   * Copia el texto actual al portapapeles
-   * @function
-   */
   const copiarTexto = () => {
     navigator.clipboard.writeText(textoNota);
   };
 
-  /**
-   * Limpia el texto actual y notifica al componente padre
-   * @function
-   */
   const limpiarTexto = () => {
     setTextoNota("");
     setTextoModificado(true);
-    onSelect(""); // Notificar al componente padre
+    onSelect("");
   };
 
-  // --- FUNCIONES DE GESTIÓN DE PLANTILLAS ---
+  // --- FUNCIONES DE GESTIÓN ---
 
-  /**
-   * Abre el modal en modo agregar con el formulario vacío
-   * @function
-   */
   const abrirModalAgregar = () => {
     setModoModal("agregar");
     setFormData({ novedad: "", nota_publica: "", nota_interna: "" });
     setMostrarModal(true);
   };
 
-  /**
-   * Abre el modal en modo modificar con los datos de la plantilla seleccionada
-   * @function
-   */
   const abrirModalModificar = () => {
-    // Validar que haya una nota seleccionada
     if (!notaSeleccionada) {
       alert("Selecciona una nota primero");
       return;
@@ -274,28 +166,18 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
     setMostrarModal(true);
   };
 
-  /**
-   * Maneja el envío del formulario del modal (agregar o modificar)
-   * @async
-   * @function
-   * @returns {Promise<void>}
-   */
   const handleSubmitModal = async () => {
     const token = localStorage.getItem("token");
     const usuarioRaw = localStorage.getItem("usuario");
     const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
 
-    // Validar autenticación
     if (!token || !usuario?.id) return;
 
     try {
       let response;
 
       if (modoModal === "agregar") {
-        // Crear nombre único para evitar duplicados
         const nombreUnico = `${formData.novedad.trim()} - ${Date.now()}`;
-
-        // Realizar petición POST para crear nueva plantilla
         response = await fetch(`${API}`, {
           method: "POST",
           headers: {
@@ -310,10 +192,7 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
           }),
         });
       } else {
-        // Modo modificar - obtener datos actuales
         const actual = plantillas[notaSeleccionada];
-
-        // Realizar petición PUT para actualizar plantilla existente
         response = await fetch(`${API}/plantilla/${actual.plantilla_id}`, {
           method: "PUT",
           headers: {
@@ -328,42 +207,23 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
             plantilla: ""
           }),
         });
-        // Actualizar la selección si cambió el nombre
         setNotaSeleccionada(formData.novedad.trim());
       }
 
-      // Manejar errores de la API
       if (response && !response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("usuario");
-          alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
-          window.location.href = "/login";
-          return;
-        }
-
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.mensaje || `Error ${response.status}: ${response.statusText}`);
+        throw new Error(errorData.mensaje || `Error ${response.status}`);
       }
 
-      // Cerrar modal y recargar datos
       setMostrarModal(false);
       cargarPlantillas();
     } catch (error) {
-      console.error("Error al guardar/editar:", error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       alert(`Error al guardar plantilla: ${errorMessage}`);
     }
   };
 
-  /**
-   * Elimina la plantilla seleccionada con confirmación del usuario
-   * @async
-   * @function
-   * @returns {Promise<void>}
-   */
   const eliminarPlantilla = async () => {
-    // Validar que haya una nota seleccionada
     if (!notaSeleccionada) {
       alert("Selecciona una nota primero");
       return;
@@ -373,7 +233,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    // Confirmación de eliminación
     if (!window.confirm(`¿Eliminar plantilla "${notaSeleccionada}"?`)) return;
 
     try {
@@ -382,38 +241,25 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Manejar errores de la API
       if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("usuario");
-          alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
-          window.location.href = "/login";
-          return;
-        }
-
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.mensaje || `Error ${response.status}: ${response.statusText}`);
+        throw new Error(errorData.mensaje || `Error ${response.status}`);
       }
 
-      // Limpiar estados y recargar datos
       setNotaSeleccionada("");
       setTextoNota("");
       onSelect("");
       cargarPlantillas();
     } catch (error) {
-      console.error("❌ Error al eliminar plantilla:", error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       alert(`Error al eliminar plantilla: ${errorMessage}`);
     }
   };
 
-  // --- RENDERIZADO DEL COMPONENTE ---
   return (
     <div className="plantilla-view-wrapper">
       <div className="plantilla-container-premium">
         <div className="plantilla-card-premium">
-          {/* Header con icono, título y subtítulo */}
           <div className="plantilla-header-premium">
             <div className="header-icon-box-p">
               <span className="material-symbols-outlined">description</span>
@@ -424,7 +270,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
             </div>
           </div>
 
-          {/* Dropdown para seleccionar nota */}
           <div className="category-section-p">
             <label className="label-p">• SELECCIONAR CATEGORÍA</label>
             <div className="select-wrapper-p">
@@ -440,7 +285,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
             </div>
           </div>
 
-          {/* Botones de Acción Superior */}
           <div className="actions-grid-p">
             <button className="action-btn-p" onClick={abrirModalAgregar}>
               <span className="material-symbols-outlined">add</span>
@@ -456,7 +300,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
             </button>
           </div>
 
-          {/* Textarea para edición de notas */}
           <div className="textarea-section-p">
             <textarea
               value={textoNota}
@@ -466,7 +309,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
             />
           </div>
 
-          {/* Seleccionador de Tipo de Nota */}
           <div className="type-toggle-p">
             <button
               className={`type-toggle-btn ${tipoNota === "publica" ? "active" : ""}`}
@@ -485,7 +327,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
             </button>
           </div>
 
-          {/* Botones de utilidad */}
           <div className="utility-grid-p">
             <button className="util-btn-p copy" onClick={copiarTexto}>
               <span className="material-symbols-outlined">content_copy</span>
@@ -499,9 +340,6 @@ const PlantillaSelector: React.FC<PlantillaSelectorProps> = ({ torre, onSelect }
         </div>
       </div>
 
-      {/* Marca de Agua SIGED */}
-
-      {/* Modal para agregar/modificar plantillas */}
       {mostrarModal && (
         <div className="modal-overlay" onClick={() => setMostrarModal(false)}>
           <div className="modal-content glass" onClick={(e) => e.stopPropagation()}>
