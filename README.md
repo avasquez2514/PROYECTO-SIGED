@@ -1,5 +1,4 @@
-# 💻 SERVICIO WEB SIGED - SISTEMA INTEGRADO DE GESTION DESPACHO 
-
+# 💻 SERVICIO WEB SIGED - SISTEMA INTEGRADO DE GESTION DESPACHO IA - INTREGADA
 [![Estado del Proyecto](https://img.shields.io/badge/STATUS-FINALIZADO-brightgreen)]([URL-DEL-PROYECTO-EN-RENDER])
 [![Tecnología Principal](https://img.shields.io/badge/Frontend-Next.js-000000)](https://nextjs.org/)
 [![Base de Datos](https://img.shields.io/badge/Base%20de%20Datos-Supabase-3ecf8e)](https://supabase.com/)
